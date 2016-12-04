@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<msq xmlns="http://www.msefi.com/:msq">
+<bibliography author="TunerStudio MS(Beta) 3.0.08 - EFI Analytics, Inc." tuneComment="" writeDate="Sun Dec 04 23:08:26 GMT 2016"/>
+<versionInfo fileFormat="5.0" firmwareInfo="" nPages="7" signature="IOExtender V0.2.00  "/>
+<page>
+<pcVariable name="tsCanId">"CAN ID 0"</pcVariable>
+<pcVariable name="pwm_channel_select">"pwm1"</pcVariable>
+</page>
+<page number="0" size="64"/>
+<page number="1" size="443">
+<constant name="pwm1_curve_table">"Table"</constant>
+<constant name="pwm2_curve_table">"Table"</constant>
+<constant name="pwm3_curve_table">"Table"</constant>
+<constant name="pwm4_curve_table">"Table"</constant>
+<constant name="pwm5_curve_table">"Table"</constant>
+<constant name="pwm6_curve_table">"Table"</constant>
+<constant name="pwm7_curve_table">"Table"</constant>
+<constant name="pwm8_curve_table">"Table"</constant>
+<constant digits="0" name="pwm1_root_offsetA">13.0</constant>
+<constant digits="0" name="pwm1_root_canidA">1.0</constant>
+<constant digits="0" name="pwm1_xaxis_offsetA">31.0</constant>
+<constant digits="0" name="pwm1_xaxis_canidA">0.0</constant>
+<constant name="port1_pin_type">"PWM3"</constant>
+<constant name="port2_pin_type">"PWM5"</constant>
+<constant name="port3_pin_type">"PWM1"</constant>
+<constant name="port4_pin_type">"Digital"</constant>
+<constant name="port7_pin_type">"PWM6"</constant>
+<constant name="port8_pin_type">"Digital"</constant>
+<constant name="port9_pin_type">"Digital"</constant>
+<constant name="port10_pin_type">"PWM1"</constant>
+</page>
+<page number="2" size="384"/>
+<page number="3" size="744">
+<constant cols="32" digits="0" name="port_CanId" rows="2">
+         1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+         0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+      </constant>
+<constant cols="1" digits="0" name="port_Enabled" rows="32" units="on/off">
+         1.0 
+         1.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         1.0 
+         0.0 
+         0.0 
+         1.0 
+         0.0 
+         0.0 
+         0.0 
+         1.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+      </constant>
+<constant cols="32" digits="0" name="port_Condition1" rows="2">
+         62.0 60.0 61.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 
+         60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 60.0 
+      </constant>
+<constant cols="1" digits="0" name="port_InitValue" rows="32">
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+      </constant>
+<constant cols="1" digits="0" name="port_PortValue" rows="32">
+         1.0 
+         0.0 
+         1.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+      </constant>
+<constant cols="32" digits="0" name="port_OutSize" rows="2">
+         129.0 0.0 130.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+         0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+      </constant>
+<constant cols="32" digits="0" name="port_OutOffset" rows="2">
+         4.0 0.0 41.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+         0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+      </constant>
+<constant name="port1sel">"PA4"</constant>
+<constant name="port2sel">"PB6"</constant>
+<constant name="port3sel">"PA6"</constant>
+<constant name="port7sel">"PB2"</constant>
+<constant name="port14sel">"PB3"</constant>
+</page>
+<page number="4" size="255">
+<constant name="pwm_opt_on_1">"Off"</constant>
+<constant name="pwm_opt_freq_1">"On-Off"</constant>
+<constant name="pwm_opt_load_1">"RPM"</constant>
+<constant name="pwm_opt2_1">"PA0"</constant>
+<constant digits="0" name="pwm_opt_load_1_offset">25.0</constant>
+<constant digits="0" name="pwm_opt_load_1_size">130.0</constant>
+<constant name="pwm_opt_curve_1">"Curve"</constant>
+<constant cols="1" digits="0" name="pwm_rpms_1" rows="6" units="rpm">
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+      </constant>
+<constant cols="1" digits="0" name="pwm_loadvals_1" rows="6" units="%">
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+      </constant>
+<constant cols="1" digits="0" name="pwm_xaxis_1" rows="12">
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+         0.0 
+      </constant>
+</page>
+<page number="5" size="510"/>
+<page number="6" size="255"/>
+<settings Comment="These setting are only used if this msq is opened without a project.">
+<setting name="SHOW_INDICATORS" value="SHOW_INDICATORS"/>
+<setting name="CAN_COMMANDS" value="CAN_COMMANDS"/>
+</settings>
+<userComments Comment="These are user comments that can be related to a particular setting or dialog."/>
+</msq>
