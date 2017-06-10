@@ -9,11 +9,14 @@ Io operations are programmed with logic, < ,>,= and bitwise AND . some variants 
 
 Versions 
 GPIO MINI V0.001
+
 This firmware supports up to 16 output channels , 16 input channels and 16 analog channels from local sources subject to MCU capability.
 MCU supported are currently Arduino Pro-Mini , Arduino Uno and Arduino Mega2560.
 The Output channels can be activated via one condition with logical operations of < , > and =
 Only onboard(local) io are supported in this version.
+
 GPIO MINI V0.002
+
 This firmware offers the same features as V0.001 but with the ability to also access the values from a Speeduino ECU connected directly using the Speeduino Serial3 support.
 
 GPIO STD Version 1.00
