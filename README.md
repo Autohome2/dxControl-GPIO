@@ -3,7 +3,9 @@
 The Gpio for Speeduino are a family of multipurpose general programmable input and output modules.
 The modules are programmed via Tunerstudio either via the serial port or over the integrated CanBus network
 
-The moduleconsists of a main motherboard fitted with a Teensy 3.2 and daughter boards
+The modules can use several different processor board types, including different arduino, teensy,  stm32.
+
+main mothe rboard fitted with a Teensy 3.2 and daughter boards
 To date there are three types of daughter boards u
 
 	1 8ch digital inputs 
