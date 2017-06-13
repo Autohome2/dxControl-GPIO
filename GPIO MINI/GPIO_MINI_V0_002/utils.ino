@@ -33,7 +33,7 @@ void setPinMapping(byte boardID)
 {
     switch (boardID)
   {
-    case 0:
+    case 0://pro-mini demo V0.001
       pinOut[1] = 2; //
       pinOut[2] = 3; //
       pinOut[3] = 4; //
@@ -87,7 +87,7 @@ void setPinMapping(byte boardID)
       
       break;
 
-      case 1:
+      case 1: // mega2560 demo V0.001
       pinOut[1] = 2; //
       pinOut[2] = 3; //
       pinOut[3] = 4; //
@@ -126,7 +126,61 @@ void setPinMapping(byte boardID)
       pinAin[2] = A1;
       pinAin[3] = A2;
       pinAin[4] = A3;
-      pinAin[5] = 0;
+      pinAin[5] = A4;
+      pinAin[6] = A5;
+      pinAin[7] = A6;
+      pinAin[8] = A7;
+      pinAin[9] = A8;
+      pinAin[10] = A9;
+      pinAin[11] = A10;
+      pinAin[12] = A11;
+      pinAin[13] = A12;
+      pinAin[14] = A13;
+      pinAin[15] = A14;
+      pinAin[16] = A15;
+      
+      break;
+            #if defined(ARDUINO_AVR_MEGA2560)
+      case 3:   // mega2560 using Speeduino V0.3 board
+      pinOut[1] = 8; //
+      pinOut[2] = 9; //
+      pinOut[3] = 10; //
+      pinOut[4] = 11; //
+      pinOut[5] = 28; //
+      pinOut[6] = 24; //
+      pinOut[7] = 40; //
+      pinOut[8] = 36; //
+      pinOut[9] = 4; //
+      pinOut[10] = 5; //
+      pinOut[11] = 6; //
+      pinOut[12] = 7; //
+      pinOut[13] = 0; //
+      pinOut[14] = 0; //
+      pinOut[15] = 0; //
+      pinOut[16] = 0; //
+
+      pinIn[1] = 12;
+      pinIn[2] = 0;
+      pinIn[3] = 0;
+      pinIn[4] = 0;
+      pinIn[5] = 0;
+      pinIn[6] = 0;
+      pinIn[7] = 0;
+      pinIn[8] = 0;
+      pinIn[9] = 0;
+      pinIn[10] = 0;
+      pinIn[11] = 0;
+      pinIn[12] = 0;
+      pinIn[13] = 0;
+      pinIn[14] = 0;
+      pinIn[15] = 0;
+      pinIn[16] = 0;
+             
+      pinAin[1] = A0;
+      pinAin[2] = A1;
+      pinAin[3] = A2;
+      pinAin[4] = A3;
+      pinAin[5] = A8;
       pinAin[6] = 0;
       pinAin[7] = 0;
       pinAin[8] = 0;
@@ -140,6 +194,63 @@ void setPinMapping(byte boardID)
       pinAin[16] = 0;
       
       break;
+      #endif
+
+      #if defined(ARDUINO_AVR_MEGA2560)
+      case 4:   // mega2560 using Speeduino V0.4 board
+      pinOut[1] = 8; //
+      pinOut[2] = 9; //
+      pinOut[3] = 10; //
+      pinOut[4] = 11; //
+      pinOut[5] = 40; //
+      pinOut[6] = 38; //
+      pinOut[7] = 52; //
+      pinOut[8] = 50; //
+      pinOut[9] = 4; //
+      pinOut[10] = 5; //
+      pinOut[11] = 6; //
+      pinOut[12] = 7; //
+      pinOut[13] = 45; //
+      pinOut[14] = 47; //
+      pinOut[15] = 0; //
+      pinOut[16] = 0; //
+
+      pinIn[1] = 12;
+      pinIn[2] = 0;
+      pinIn[3] = 0;
+      pinIn[4] = 0;
+      pinIn[5] = 0;
+      pinIn[6] = 0;
+      pinIn[7] = 0;
+      pinIn[8] = 0;
+      pinIn[9] = 0;
+      pinIn[10] = 0;
+      pinIn[11] = 0;
+      pinIn[12] = 0;
+      pinIn[13] = 0;
+      pinIn[14] = 0;
+      pinIn[15] = 0;
+      pinIn[16] = 0;
+             
+      pinAin[1] = A0;
+      pinAin[2] = A1;
+      pinAin[3] = A2;
+      pinAin[4] = A3;
+      pinAin[5] = A8;
+      pinAin[6] = 0;
+      pinAin[7] = 0;
+      pinAin[8] = 0;
+      pinAin[9] = 0;
+      pinAin[10] = 0;
+      pinAin[11] = 0;
+      pinAin[12] = 0;
+      pinAin[13] = 0;
+      pinAin[14] = 0;
+      pinAin[15] = 0;
+      pinAin[16] = 0;
+      
+      break;
+      #endif
   }
 
 //setup pin use flags for digouts
