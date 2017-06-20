@@ -186,8 +186,6 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
                     
            case 87:  //r version of W(0x57)
                  // int valueOffset; //cannot use offset as a variable name, it is a reserved word for several teensy libraries
-                 currentStatus.dev1 = theoffset;
-                 currentStatus.dev2 = thelength;
                   direct_receiveValue(theoffset, thelength);  //Serial.read());                    
            break;
        } //closes the switch/case 

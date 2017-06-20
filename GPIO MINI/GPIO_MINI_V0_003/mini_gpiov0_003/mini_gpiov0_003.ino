@@ -71,6 +71,10 @@ struct config2 configPage2;
 struct statuses currentStatus;
 
 volatile int mainLoopCount;
+volatile byte Achanloop;
+volatile byte diginchanloop;
+volatile byte driveoutloop;
+volatile byte EXinchanloop;
 
 void setup() {
   // put your setup code here, to run once:
@@ -108,7 +112,7 @@ void loop()
             }
         } 
             
-      if ( ((mainLoopCount & 31) == 1) or (Serial.available() > 32) )
+      if ( ((mainLoopCount & 63) == 1) or (Serial.available() > 32) )
         {
          if (Serial.available() > 0)      // if Serial has data then do the command subroutine
            {
@@ -116,33 +120,63 @@ void loop()
            }
         }
         
-       if ((mainLoopCount & 31) == 1) //Every 32 loops read analog and digital inputs
+       if ((mainLoopCount & 63) == 1) //Every 32 loops read analog and digital inputs
             {
-              for (byte Achan = 1; Achan <17 ; Achan++)
-                  {
-                    if (pinAin[Achan] < 255) {readAnalog(Achan);}        // read the analog inputs
-                  }
-
-              for (byte Dinchan = 1; Dinchan <17 ; Dinchan++)
-                  {
-                    if (pinIn[Dinchan] < 255) { readDigitalIn(Dinchan);}        // if pin is not set to 0 then is in use so read the digital input
-                  }    
+             if (pinAin[Achanloop] < 255) {readAnalog(Achanloop);}        // read the analog inputs
+              if (Achanloop < 16)
+                {
+                  Achanloop++;
+                }
+              else
+                {
+                  Achanloop = 0;
+                }
+              
+             if (pinIn[diginchanloop] < 255) { readDigitalIn(diginchanloop);}        // if pin is not set to 0 then is in use so read the digital input
+              if (diginchanloop < 16)
+                {
+                  diginchanloop++;
+                }
+              else
+                {
+                  diginchanloop = 0;
+                }
             }
 
-       if ((mainLoopCount & 31) == 1) //Every 32 loops do outputs
+       if ((mainLoopCount & 63) == 1) //Every 32 loops do outputs
             {
-            driveOutputs(); 
+            driveOutputs(driveoutloop); 
+                         if (driveoutloop < 16)
+                {
+                  driveoutloop++;
+                }
+              else
+                {
+                  driveoutloop = 0;
+                  if(BIT_CHECK(currentStatus.testOutputs, 0)) //if testenabled is set 
+                      {   
+                      if(BIT_CHECK(currentStatus.testOutputs, 1) == 0) //and if testactive is clear 
+                          {
+                            BIT_CLEAR(currentStatus.testOutputs, 0);    //clear testenabled flag now all outputs have been forced
+                          }
+                      }   
+                } 
             }
 
-       if ((mainLoopCount & 127) == 1) //Every 64 loops read analog and digital inputs
+       if ((mainLoopCount & 63) == 1) //Every 64 loops read analog and digital inputs
             {
-              byte bittest;
-              for (byte EXinchan = 1; EXinchan <17 ; EXinchan++)
-                  {
-                    if (BIT_CHECK(configPage1.exinsel,(EXinchan-1)))
-                      {
-                        getExternalInput(EXinchan);
-                      }        // read the external inputs if enabled
-                  }
+             if (BIT_CHECK(configPage1.exinsel,(EXinchanloop-1)))
+               {
+                getExternalInput(EXinchanloop);
+               }        // read the external inputs if enabled
+                           
+             if (EXinchanloop < 16)
+                {
+                  EXinchanloop++;
+                }
+              else
+                {
+                  EXinchanloop = 0;
+                }    
             }                  
 }

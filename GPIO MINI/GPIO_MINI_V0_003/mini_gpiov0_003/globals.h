@@ -63,8 +63,8 @@ this is 1 byte long.
 if you set realtime_bytes = 2
 then you will also be sent offset 9 too which is currentStatus.O2
  */
-const unsigned char simple_remote_signature[]    = "speeduino_mini_GPIOV0.002 201706"; //this must match the ini
-const unsigned char simple_remote_RevNum[] = "speeduino 201706-mini GPIO V0.002";      //this is what is displayed in the TS header bar
+const unsigned char simple_remote_signature[]    = "speeduino_mini_GPIOV0.003 201706"; //this must match the ini
+const unsigned char simple_remote_RevNum[] = "speeduino 201706-mini GPIO V0.003";      //this is what is displayed in the TS header bar
 uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
 const uint8_t page_1_size = 128;
@@ -125,9 +125,9 @@ uint16_t DinchanActive_2;         // digital input channels 17-32 active flags
 uint16_t AinchanActive;           // analog input channels 1-16 active flags
 uint16_t AinchanActive_2;         // analog  input channels 17-32 active flags
 uint16_t exinsel;                 // External input channel enabled bit flags
-uint16_t INdata_from_Can[15];     // can address of source of data 0x100(256dec) to 0x7FF(1047dec) as 0 dec - 535 dec
-byte data_from_offset[15];        // offset of data source 0 - 255
-byte num_bytes[15];               // number of bytes length of data source 0,1,or 2
+uint16_t INdata_from_Can[16];     // can address of source of data 0x100(256dec) to 0x7FF(2047dec) as 0 dec - 535 dec
+byte data_from_offset[16];        // offset of data source 0 - 255
+byte num_bytes[16];               // number of bytes length of data source 0,1,or 2
 byte unused88;
 byte unused89;
 byte unused90;

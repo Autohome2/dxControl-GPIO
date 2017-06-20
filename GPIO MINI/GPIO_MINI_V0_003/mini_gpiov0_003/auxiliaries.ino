@@ -1,8 +1,8 @@
-void driveOutputs()
+void driveOutputs(byte DoutCH)
 {
   
-  for (byte DoutCH = 1; DoutCH < 17 ; DoutCH++)     //loop through outputs 1 to 16
-    {
+//  for (byte DoutCH = 1; DoutCH < 17 ; DoutCH++)     //loop through outputs 1 to 16
+//    {
       
      portX = DoutCH-1;
      if (pinOut[portX+1] < 255)    //if pin is not set to 255 then is in use by selected board so drive the digital outputs according to current active channel
@@ -111,15 +111,9 @@ void driveOutputs()
         configPage2.port_Enabled[portX] = 0; //disable output as pin is not configured
         state = 0;    //pin is unused(0 in utils) so set pin state off
       }        
-    }     // ends the for next 1-17 count loop
+  //  }     // ends the for next 1-17 count loop
     
-   if(BIT_CHECK(currentStatus.testOutputs, 0)) //if testenabled is set 
-     {   
-      if(BIT_CHECK(currentStatus.testOutputs, 1) == 0) //and if testactive is clear 
-        {
-          BIT_CLEAR(currentStatus.testOutputs, 0);    //clear testenabled flag now all outputs have been forced
-        }
-     }   
+
 }
 
 void outputaction(uint8_t chanX)
