@@ -20,7 +20,7 @@ Hence we will preload the timer with 131 cycles to leave 125 until overflow (1ms
 #define TIMERS_H
 
 //#if defined(CORE_AVR)
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) 
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO) 
   #include <avr/interrupt.h>
   #include <avr/io.h>
 #endif

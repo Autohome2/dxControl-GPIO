@@ -25,7 +25,7 @@ A full copy of the license may be found in the speeduino projects root directory
   // mega pin assignments
   #define SERIALLink Serial3
   
-#elif defined(ARDUINO_AVR_PRO)
+#elif defined(ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO) 
   // Pro Mini assignments
   #include <SoftwareSerial.h>
 SoftwareSerial mysoftSerial(A4, A5);  //(10, 11);  // RX, Tx   connect to Serial3 on the Speeduino Mega

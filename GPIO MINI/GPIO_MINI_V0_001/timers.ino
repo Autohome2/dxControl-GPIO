@@ -14,7 +14,7 @@ Timers are typically low resolution (Compared to Schedulers), with maximum frequ
 void initialiseTimers()
 {
 //#if defined(CORE_AVR) //AVR chips use the ISR for this
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO)
    //Configure Timer2 for our low-freq interrupt code.
  //  TCCR2B = 0x00;          //Disbale Timer2 while we set it up
   // TCNT2  = 131;           //Preload timer2 with 131 cycles, leaving 125 till overflow. As the timer runs at 125Khz, this causes overflow to occur at 1Khz = 1ms
@@ -52,7 +52,7 @@ void initialiseTimers()
 
 //Timer2 Overflow Interrupt Vector, called when the timer overflows.
 //Executes every ~1ms.
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) //AVR chips use the ISR for this
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO) //AVR chips use the ISR for this
 ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
 #elif defined (CORE_TEENSY) || defined(CORE_STM32)
 void oneMSInterval() //Most ARM chips can simply call a function
@@ -94,7 +94,7 @@ void oneMSInterval() //Most ARM chips can simply call a function
 
   }
 //#if defined(CORE_AVR)
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO)  //AVR chips use the ISR for this
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO)  //AVR chips use the ISR for this
     //Reset Timer2 to trigger in another ~1ms
     TCNT2 = 130;            //Preload timer2 with 100 cycles, leaving 156 till overflow.
     TIFR2  = 0x00;          //Timer2 INT Flag Reg: Clear Timer Overflow Flag
