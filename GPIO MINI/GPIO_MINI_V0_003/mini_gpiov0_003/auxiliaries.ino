@@ -1,13 +1,13 @@
-void driveOutputs(byte DoutCH)
+void driveOutputs()
 {
   
-//  for (byte DoutCH = 1; DoutCH < 17 ; DoutCH++)     //loop through outputs 1 to 16
-//    {
+  for (byte DoutCH = 1; DoutCH < 17 ; DoutCH++)     //loop through outputs 1 to 16
+    {
       
      portX = DoutCH-1;
      if (pinOut[portX+1] < 255)    //if pin is not set to 255 then is in use by selected board so drive the digital outputs according to current active channel
        { 
-        if(BIT_CHECK(currentStatus.testOutputs, 0) == 0)   //if testenable unset then check outputs according to port editor
+        if(BIT_CHECK(currentStatus.testIO_hardware, 0) == 0)   //if testenable unset then check outputs according to port editor
           {   
     //currentStatus.dev1 = configPage2.port_Enabled[portX];
            if(configPage2.port_Enabled[portX] == 1)
@@ -111,7 +111,7 @@ void driveOutputs(byte DoutCH)
         configPage2.port_Enabled[portX] = 0; //disable output as pin is not configured
         state = 0;    //pin is unused(0 in utils) so set pin state off
       }        
-  //  }     // ends the for next 1-17 count loop
+    }     // ends the for next 1-17 count loop
     
 
 }
@@ -189,3 +189,9 @@ void initialOutputs()
     }
 
 }    
+void blinkCEL()
+{
+  digitalWrite(LED_BUILTIN,1);
+
+}
+

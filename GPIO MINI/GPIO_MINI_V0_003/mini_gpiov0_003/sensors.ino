@@ -15,8 +15,7 @@ void initialiseADC()
 void readAnalog(uint8_t AinCH)
 {
     tempReading = analogRead( pinAin[AinCH]);   //read the adc channel
-   
-    #if defined(ARDUINO_AVR_MEGA2560)
+       #if defined(ARDUINO_AVR_MEGA2560)
     tempReading = analogRead( pinAin[AinCH]);   //read it a second time to get a more stable /faster read
     #endif
     

@@ -32,9 +32,13 @@ Hence we will preload the timer with 131 cycles to leave 125 until overflow (1ms
   void oneMSInterval();
 #endif  
   
+volatile int loop33ms;
+volatile int loop40ms;
+volatile int loop66ms;  
 volatile int loop100ms;
 volatile int loop250ms;
 volatile int loopSec;
+volatile int celBlink;
 
 void initialiseTimers();
 

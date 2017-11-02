@@ -9,7 +9,11 @@
 void writeConfig();
 void loadConfig();
 uint8_t NVMEMread(uint16_t address);
-void NVMEMwrite(uint16_t address, uint8_t dataByte);
+//void NVMEMwrite(uint16_t address, uint8_t dataByte);
+void write_byte(word page, byte offset, byte databyte);
+  #if defined (USE_EXT_FLASH)
+  void erase_flash_swap_page();
+  #endif
 
 /*
 Current layout of EEPROM data (Version 3) is as follows (All sizes are in bytes):
