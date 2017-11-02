@@ -60,15 +60,41 @@ void oneMSInterval() //Most ARM chips can simply call a function
 {
 
   //Increment Loop Counters
+  loop33ms++;
+  loop40ms++;
+  loop66ms++;
   loop100ms++;
   loop250ms++;
   loopSec++;
+  
+  //30Hz loop
+  if (loop33ms == 33)
+  {
+    loop33ms = 0;
+    BIT_SET(TIMER_mask, BIT_TIMER_30HZ);
+  }
+
+  //25Hz loop
+  if (loop40ms == 40)
+  {
+    loop40ms = 0;
+    BIT_SET(TIMER_mask, BIT_TIMER_25HZ);
+  }
+  
+  //15Hz loop
+  if (loop66ms == 66)
+  {
+    loop66ms = 0;
+    BIT_SET(TIMER_mask, BIT_TIMER_15HZ);
+  }
+
 
   //Loop executed every 100ms loop
   //Anything inside this if statement will run every 100ms.
   if (loop100ms == 100)
   {
     loop100ms = 0; //Reset counter
+    BIT_SET(TIMER_mask, BIT_TIMER_10HZ);
   }
 
   //Loop executed every 250ms loop (1ms x 250 = 250ms)
@@ -76,12 +102,21 @@ void oneMSInterval() //Most ARM chips can simply call a function
   if (loop250ms == 250)
   {
     loop250ms = 0; //Reset Counter.
+    BIT_SET(TIMER_mask, BIT_TIMER_4HZ);
   }
 
   //Loop executed every 1 second (1ms x 1000 = 1000ms)
   if (loopSec == 1000)
   {
+    if(celBlink != (celBlink_time+1)){ celBlink++;}
+    
+    if (celBlink == celBlink_time)
+    {
+      digitalWrite(LED_BUILTIN,0);
+    }
+    
     loopSec = 0; //Reset counter.
+    BIT_SET(TIMER_mask, BIT_TIMER_1HZ);
   
     //**************************************************************************************************************************************************
     //This records the number of main loops the system has completed in the last second

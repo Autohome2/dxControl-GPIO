@@ -19,7 +19,7 @@ It parses the command and calls the relevant function
 
 void direct_serial_command()
 {
-    switch (Serial.read())
+    switch (CONSOLE_SERIALLink.read())
           {
           case 'A':
                   direct_sendValues(0, direct_packetSize, 60);
@@ -36,22 +36,22 @@ void direct_serial_command()
           case 'E': // receive command button commands
                   byte tmp;
                   uint16_t theoffset;
-                  while (Serial.available() == 0) {}
-                  tmp = Serial.read();
-                  while (Serial.available() == 0) {}
-                  theoffset = (Serial.read()<<8) | tmp;
-                 // theoffset = word(Serial.read(), tmp);
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  tmp = CONSOLE_SERIALLink.read();
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
+                 // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
                   commandButtons(theoffset);
           break;
           
           case 'F': // send serial protocol version
-                  Serial.print("001");
+                  CONSOLE_SERIALLink.print("001");
           break;
 
           case 'P': // set the current page
                     //A 2nd byte of data is required after the 'P' specifying the new page number.
-                  while (Serial.available() == 0) {}
-                  currentStatus.currentPage = Serial.read();
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  currentStatus.currentPage = CONSOLE_SERIALLink.read();
                   if (currentStatus.currentPage >= '0') {//This converts the ascii number char into binary
                   currentStatus.currentPage -= '0';
                   }
@@ -60,14 +60,14 @@ void direct_serial_command()
           case 'Q': // send code version
                     for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
                         {
-                        Serial.write(simple_remote_signature[sg]);  
+                        CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
                         }
           break;
           
           case 'S': // send code version
                     for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
                         {
-                        Serial.write(simple_remote_RevNum[sg]);
+                        CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
                         currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
                         }
           break;
@@ -77,35 +77,35 @@ void direct_serial_command()
           break;
 
           case 'W': // receive new VE obr constant at 'W'+<offset>+<newbyte>
-                while (Serial.available() == 0) {}
-                tmp = Serial.read();
-                while (Serial.available() == 0) {}
-                theoffset = (Serial.read()<<8) | tmp;
-                //theoffset = word(Serial.read(), tmp);
-                while (Serial.available() == 0) {}
-                direct_receiveValue(theoffset, Serial.read());
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tmp = CONSOLE_SERIALLink.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
+                //theoffset = word(CONSOLE_SERIALLink.read(), tmp);
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                direct_receiveValue(theoffset, CONSOLE_SERIALLink.read());
           break;
      
           case 'r': 
                 byte cmd;
                 byte tsCanId_sent;         
-                while (Serial.available() == 0) {}
-                tsCanId_sent = Serial.read(); //Read the $tsCanId
-                while (Serial.available() == 0) {}
-                cmd = Serial.read();
-                while (Serial.available() == 0) {}
-                tmp = Serial.read();
-                while (Serial.available() == 0) {}
-                theoffset = (Serial.read()<<8) | tmp;
-               // theoffset = word(Serial.read(), tmp);
-                while (Serial.available() == 0) {}
-                tmp = Serial.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tsCanId_sent = CONSOLE_SERIALLink.read(); //Read the $tsCanId
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                cmd = CONSOLE_SERIALLink.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tmp = CONSOLE_SERIALLink.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
+               // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tmp = CONSOLE_SERIALLink.read();
                 
                 if (cmd != 87)          //if is "W" only 1 more byte is sent
                  {
-                  while (Serial.available() == 0) {}
-                  thelength = (Serial.read()<<8) | tmp;
-                 // thelength = word(Serial.read(), tmp); 
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  thelength = (CONSOLE_SERIALLink.read()<<8) | tmp;
+                 // thelength = word(CONSOLE_SERIALLink.read(), tmp); 
                  }
              else{thelength = tmp;}
          
@@ -146,20 +146,20 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
            case 15:    //
                     for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
                         {
-                        Serial.write(simple_remote_signature[sg]);  
+                        CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
                         }  
            break;
                         
            case 14:  //
                     for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
                         {
-                        Serial.write(simple_remote_RevNum[sg]);
+                        CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
                         currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
                         }     
            break;
                         
            case 48:    //previously 0x30:
-                                // Serial.print("got to 3d");
+                                // CONSOLE_SERIALLink.print("got to 3d");
                                  // direct_sendValues(offset, length, cmd);
            break;
                         
@@ -186,7 +186,7 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
                     
            case 87:  //r version of W(0x57)
                  // int valueOffset; //cannot use offset as a variable name, it is a reserved word for several teensy libraries
-                  direct_receiveValue(theoffset, thelength);  //Serial.read());                    
+                  direct_receiveValue(theoffset, thelength);  //CONSOLE_SERIALLink.read());                    
            break;
        } //closes the switch/case 
 }
@@ -279,7 +279,7 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
             }
           else
           {  
-          Serial.write((uint8_t *)&response, sizeof(response));
+          CONSOLE_SERIALLink.write((uint8_t *)&response, sizeof(response));
           }
       
 }
@@ -314,7 +314,7 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
   fullStatus[9] = highByte(currentStatus.dev1);
   fullStatus[10] = lowByte(currentStatus.dev2);
   fullStatus[11] = highByte(currentStatus.dev2);
-  fullStatus[12] = currentStatus.testOutputs;
+  fullStatus[12] = currentStatus.testIO_hardware;
   fullStatus[13] = lowByte(currentStatus.digIn);
   fullStatus[14] = highByte(currentStatus.digIn);
   fullStatus[15] = lowByte(currentStatus.digOut);    
@@ -391,12 +391,12 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
 
   if (cmd == 60)
     {
-      Serial.write(response, (size_t)packetLength); 
-      //Serial.write(response, (size_t)packetLength);
+      CONSOLE_SERIALLink.write(response, (size_t)packetLength); 
+      //CONSOLE_SERIALLink.write(response, (size_t)packetLength);
     }
   else if (cmd == 180)
     {
-      //Serial.print("r was sent");
+      //CONSOLE_SERIALLink.print("r was sent");
       SERIALLink.write("r");         //confirm cmd letter 
       SERIALLink.write(zero);           //canid
       SERIALLink.write(cmd);          //confirm cmd
@@ -415,14 +415,14 @@ void commandButtons(uint16_t cmdCombined)
   switch (cmdCombined)
   {   
     case 256: // cmd is stop    
-      BIT_CLEAR(currentStatus.testOutputs, 1);    //clear testactive flag
+      BIT_CLEAR(currentStatus.testIO_hardware, 1);    //clear testactive flag
       currentStatus.digOut = 0;                   //reset all outputs to off
       break;
 
     case 257: // cmd is enable
       // currentStatus.testactive = 1;
-      BIT_SET(currentStatus.testOutputs, 0);  //set testenabled flag    
-      BIT_SET(currentStatus.testOutputs, 1);  //set testactive flag
+      BIT_SET(currentStatus.testIO_hardware, 0);  //set testenabled flag    
+      BIT_SET(currentStatus.testIO_hardware, 1);  //set testactive flag
       break;
           
     case 513:
@@ -441,7 +441,7 @@ void commandButtons(uint16_t cmdCombined)
     case 526:
     case 527:
     case 528: // cmd group is on actions
-      if(BIT_CHECK(currentStatus.testOutputs, 1))
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
         {
           BIT_SET(currentStatus.digOut, (cmdCombined-513));
         }
@@ -463,7 +463,7 @@ void commandButtons(uint16_t cmdCombined)
     case 782:
     case 783:
     case 784:
-      if(BIT_CHECK(currentStatus.testOutputs, 1))
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
         {
           BIT_CLEAR(currentStatus.digOut, (cmdCombined-769));
         }

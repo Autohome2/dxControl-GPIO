@@ -6,20 +6,48 @@
   #define BOARD_NR_GPIO_PINS 54
   #define LED_BUILTIN 13
   #define CORE_AVR
+  #define USE_INT_EEPROM
   
 #elif defined(CORE_TEENSY)
   #define BOARD_NR_GPIO_PINS 34
   
 #elif defined(STM32_MCU_SERIES) || defined(_VARIANT_ARDUINO_STM32_)
   #define CORE_STM32
+
+  //only choose one of the following two defines
+   #define USE_EXT_FLASH
+   #define EXT_FLASH_SIZE 8192
+   #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
+  // #define USE_EXT_SPI_EEPROM
+//  #define USE_EXT_FRAM
   #define LED_BUILTIN PC13
 
+  extern "C" char* sbrk(int incr); //Used to freeRam
   inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
   #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
   #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
 #else
   #error Incorrect board selected. Please select the correct board (Usually Mega 2560) and upload again
 #endif  
+
+// now set specific processor compile flags
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
+  #define MEGA_AVR
+
+#elif defined(ARDUINO_AVR_PRO)
+  #define 328_AVR
+
+#elif defined(ARDUINO_Nucleo_64)
+  #define NUCLEO_64_STM32
+
+#elif defined(MCU_STM32F103C8)
+  #define F108C8_STM32
+
+#elif defined(MCU_STM32F407VGT6)
+  #define F407_STM32  
+
+#endif
+
 /*
  The "A" command allows you to specify where in the reltime data list you want the Speeduino to start sending you data from , and how many bytes you want to be sent.
  The format is "A" where
@@ -69,6 +97,8 @@ uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
 const uint8_t page_1_size = 128;
 const uint16_t page_2_size = 256;
+volatile uint8_t swap_page = 0; // current external flash swap page number
+volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when all written
 
 byte zero = 0;
 byte tmp;         //used in assembling incoming serial data ints
@@ -79,6 +109,17 @@ uint16_t theoffset, thelength;  //used with serial data
 #define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
 #define BIT_CHECK(var,pos) ((var) & (1<<(pos)))
 
+#define BIT_TIMER_1HZ             0
+#define BIT_TIMER_4HZ             1
+#define BIT_TIMER_10HZ            2
+#define BIT_TIMER_15HZ            3
+#define BIT_TIMER_25HZ            4
+#define BIT_TIMER_30HZ            5
+#define celBlink_time             4   //4 seconds
+
+volatile byte TIMER_mask;
+volatile byte LOOP_TIMER;
+
 //The status struct contains the current values for all 'live' variables
 //In current version this is x bytes
 struct statuses {
@@ -87,7 +128,7 @@ struct statuses {
   volatile unsigned int loopsPerSecond ;
  volatile  uint16_t freeRAM ;
  volatile uint8_t currentPage;
- volatile uint8_t testOutputs;
+ volatile uint8_t testIO_hardware;//testIO_hardware
  uint16_t currentInputvalue[2];      //holds the analog input value for each conditional input , [0] first condition and [1] holds the second
  uint16_t currentInputvalueCond[3];  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
  uint8_t condition_pass[16];          // array stores pass/fail flags for the one or two(if selected) condition checks
@@ -95,6 +136,8 @@ struct statuses {
  uint8_t OutputPort[16];             //output port operating condition status flags
  volatile uint16_t digOut;        //bits showing digital output state(0-15)
  volatile uint16_t digOut_Active; // bits show if channel is used by board selected when pin value is < 255
+ volatile uint16_t digOut_2;
+ volatile uint16_t digOut_2_Active; // bits show if channel is used by board selected when pin value is < 255
  volatile uint16_t digIn;         // bits showing digital input state(0-15)
  volatile uint16_t digIn_Active;  // bits showing channel is used by board selected when pin value is < 255
  volatile uint16_t Analog[16];    // 16bit analog value data array for local analog(0-15)
@@ -103,6 +146,8 @@ struct statuses {
  
  volatile uint16_t dev1;          //developer use only
  volatile uint16_t dev2;          //developer use only
+ volatile uint16_t dev3;          //developer use only
+ volatile uint16_t dev4;          //developer use only
 };
 //struct statuses currentStatus; //The global status object
 
@@ -113,7 +158,7 @@ struct __attribute__ ( ( packed ) ) config1 {
 uint16_t master_controller_address:10 ;
 byte pinLayout;
 byte speeduinoConnection;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
-uint16_t speeduinoBaseCan:10 ;       //speeduino base can address
+uint16_t speeduinoBaseCan ;       //speeduino base can address
 byte unused6;
 byte unused7;
 byte unused8;

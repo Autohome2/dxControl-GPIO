@@ -3,30 +3,33 @@
 */
 #include "utils.h"
 
-int freeRam ()
+uint16_t freeRam ()
 {
-//#if defined(ARDUINO_AVR_MEGA2560)||(ARDUINO_AVR_PRO)
- extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-//#elif defined(CORE_TEENSY)
-//  uint32_t stackTop;
-//  uint32_t heapTop;
+#if defined (CORE_AVR)
+  extern int __heap_start, *__brkval;
+  uint16_t v;
+
+  return (uint16_t) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+
+#elif defined(CORE_TEENSY)
+  uint32_t stackTop;
+  uint32_t heapTop;
 
   // current position of the stack.
-//  stackTop = (uint32_t) &stackTop;
+  stackTop = (uint32_t) &stackTop;
 
   // current position of heap.
-//  void* hTop = malloc(1);
-//  heapTop = (uint32_t) hTop;
-//  free(hTop);
+  void* hTop = malloc(1);
+  heapTop = (uint32_t) hTop;
+  free(hTop);
 
   // The difference is the free, available ram.
-//  return (uint16_t)stackTop - heapTop;
-//#elif defined(CORE_STM32)
-  //Figure this out some_time
-//  return 0;
-//#endif
+  return (uint16_t)stackTop - heapTop;
+#elif defined(CORE_STM32)
+  char top = 't';
+//  return &top - reinterpret_cast<char*>(sbrk(0));  //what is sbrk?
+  return 0;
+#endif
 }
 
 void setPinMapping(byte boardID)
@@ -218,6 +221,7 @@ void setPinMapping(byte boardID)
       pinAin[14] = 255;
       pinAin[15] = 255;
       pinAin[16] = 255;
+      //spi_portused = 1;
       
       break;
       #endif 
