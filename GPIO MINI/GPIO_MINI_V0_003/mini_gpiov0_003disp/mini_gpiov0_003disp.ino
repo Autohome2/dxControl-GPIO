@@ -23,6 +23,10 @@ A full copy of the license may be found in the speeduino projects root directory
 #include "display.h"
 #include <EEPROM.h>
 
+#include <SPI.h>
+#include <Wire.h>
+#include <U8g2lib.h>
+
 
 //#elif defined (MCU_STM32F103C8)//(STM32_MCU_SERIES) || defined(STM32F1) || defined(STM32F4) || defined(STM32)
   // stm32 pin assignments
@@ -92,19 +96,42 @@ volatile byte diginchanloop;
 volatile byte driveoutloop;
 volatile byte EXinchanloop;
 
+//configure screen 1 display initialise options
+#if defined DISP1_ACTIVE
+    #if defined DISP1_USE_SSD1106_I2C
+        U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_1(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);   
+    #elif defined DISP1_USE_SSD1106_SPI
+        U8G2_SSD1306_128X64_NONAME_1_4W_HW_SPI u8g2_1(U8G2_R0, /* cs=*/ DISPLAY1_CS, /* dc=*/ DISPLAY1_DC, /* reset=*/ DISPLAY1_RESET);     
+    #elif defined DISP1_USE_SSH1106_SPI
+        U8G2_SH1106_128X64_NONAME_1_4W_HW_SPI u8g2_1(U8G2_R0, /* cs=*/ DISPLAY1_CS, /* dc=*/ DISPLAY1_DC, /* reset=*/ DISPLAY1_RESET);    
+    #endif
+#endif    
+
+//configure screen 2 display initialise options
+#if defined DISP2_ACTIVE
+    #if defined DISP2_USE_SSD1106_I2C
+        U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);   
+    #elif defined DISP2_USE_SSD1106_SPI
+        U8G2_SSD1306_128X64_NONAME_1_4W_HW_SPI u8g2_2(U8G2_R0, /* cs=*/ DISPLAY2_CS, /* dc=*/ DISPLAY2_DC, /* reset=*/ DISPLAY2_RESET);     
+    #elif defined DISP2_USE_SSH1106_SPI
+        U8G2_SH1106_128X64_NONAME_1_4W_HW_SPI u8g2_2(U8G2_R0, /* cs=*/ DISPLAY2_CS, /* dc=*/ DISPLAY2_DC, /* reset=*/ DISPLAY2_RESET);    
+    #endif
+#endif    
+
 void setup() {
   // put your setup code here, to run once:
  loadConfig();
  setPinMapping(configPage1.pinLayout);
  initialiseADC();
  initialiseTimers();
+ initialise_display();
 
  CONSOLE_SERIALLink.begin(115200);
  SERIALLink.begin(115200);  
 
 #if defined (CORE_STM32) && defined(USE_EXT_FLASH)
     init_stm32_flash(1);
-    CONSOLE_SERIALLink.print("ok");
+//    CONSOLE_SERIALLink.print("ok");
 #endif
     
   mainLoopCount = 0;
