@@ -14,7 +14,7 @@ Timers are typically low resolution (Compared to Schedulers), with maximum frequ
 void initialiseTimers()
 {
 //#if defined(CORE_AVR) //AVR chips use the ISR for this
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
    //Configure Timer2 for our low-freq interrupt code.
  //  TCCR2B = 0x00;          //Disbale Timer2 while we set it up
   // TCNT2  = 131;           //Preload timer2 with 131 cycles, leaving 125 till overflow. As the timer runs at 125Khz, this causes overflow to occur at 1Khz = 1ms
@@ -40,7 +40,7 @@ void initialiseTimers()
    //Uses the PIT timer on Teensy.
    lowResTimer.begin(oneMSInterval, 1000);
 
-#elif defined(CORE_STM32)
+#elif defined(MCU_STM32F103C8)
   Timer4.setPeriod(1000);  // Set up period
   // Set up an interrupt
   Timer4.setMode(TIMER_CH1, TIMER_OUTPUT_COMPARE);
@@ -52,23 +52,49 @@ void initialiseTimers()
 
 //Timer2 Overflow Interrupt Vector, called when the timer overflows.
 //Executes every ~1ms.
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO) //AVR chips use the ISR for this
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) //AVR chips use the ISR for this
 ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
-#elif defined (CORE_TEENSY) || defined(CORE_STM32)
+#elif defined (CORE_TEENSY) || defined(MCU_STM32F103C8)
 void oneMSInterval() //Most ARM chips can simply call a function
 #endif
 {
 
   //Increment Loop Counters
+  loop33ms++;
+  loop40ms++;
+  loop66ms++;
   loop100ms++;
   loop250ms++;
   loopSec++;
+  
+  //30Hz loop
+  if (loop33ms == 33)
+  {
+    loop33ms = 0;
+    BIT_SET(TIMER_mask, BIT_TIMER_30HZ);
+  }
+
+  //25Hz loop
+  if (loop40ms == 40)
+  {
+    loop40ms = 0;
+    BIT_SET(TIMER_mask, BIT_TIMER_25HZ);
+  }
+  
+  //15Hz loop
+  if (loop66ms == 66)
+  {
+    loop66ms = 0;
+    BIT_SET(TIMER_mask, BIT_TIMER_15HZ);
+  }
+
 
   //Loop executed every 100ms loop
   //Anything inside this if statement will run every 100ms.
   if (loop100ms == 100)
   {
     loop100ms = 0; //Reset counter
+    BIT_SET(TIMER_mask, BIT_TIMER_10HZ);
   }
 
   //Loop executed every 250ms loop (1ms x 250 = 250ms)
@@ -76,12 +102,21 @@ void oneMSInterval() //Most ARM chips can simply call a function
   if (loop250ms == 250)
   {
     loop250ms = 0; //Reset Counter.
+    BIT_SET(TIMER_mask, BIT_TIMER_4HZ);
   }
 
   //Loop executed every 1 second (1ms x 1000 = 1000ms)
   if (loopSec == 1000)
   {
+    if(celBlink != (celBlink_time+1)){ celBlink++;}
+    
+    if (celBlink == celBlink_time)
+    {
+      digitalWrite(LED_BUILTIN,0);
+    }
+    
     loopSec = 0; //Reset counter.
+    BIT_SET(TIMER_mask, BIT_TIMER_1HZ);
   
     //**************************************************************************************************************************************************
     //This records the number of main loops the system has completed in the last second
@@ -94,7 +129,7 @@ void oneMSInterval() //Most ARM chips can simply call a function
 
   }
 //#if defined(CORE_AVR)
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO)  //AVR chips use the ISR for this
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO)  //AVR chips use the ISR for this
     //Reset Timer2 to trigger in another ~1ms
     TCNT2 = 130;            //Preload timer2 with 100 cycles, leaving 156 till overflow.
     TIFR2  = 0x00;          //Timer2 INT Flag Reg: Clear Timer Overflow Flag

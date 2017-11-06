@@ -20,7 +20,7 @@ Hence we will preload the timer with 131 cycles to leave 125 until overflow (1ms
 #define TIMERS_H
 
 //#if defined(CORE_AVR)
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) || defined(ARDUINO_AVR_UNO) 
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) 
   #include <avr/interrupt.h>
   #include <avr/io.h>
 #endif
@@ -32,9 +32,13 @@ Hence we will preload the timer with 131 cycles to leave 125 until overflow (1ms
   void oneMSInterval();
 #endif  
   
+volatile int loop33ms;
+volatile int loop40ms;
+volatile int loop66ms;  
 volatile int loop100ms;
 volatile int loop250ms;
 volatile int loopSec;
+volatile int celBlink;
 
 void initialiseTimers();
 
