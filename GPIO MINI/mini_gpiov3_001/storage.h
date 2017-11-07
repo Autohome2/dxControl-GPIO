@@ -14,7 +14,7 @@ void writeConfig(uint8_t thePage);
 void loadConfig();
 uint8_t NVMEMread(uint16_t address);
 void NVMEMwrite(uint16_t address, uint8_t dataByte);
-void erase_flash_swap_page();
+//void erase_flash_swap_page();
 //void write_byte(word page, byte offset, byte databyte);
   #if defined (USE_EXT_FLASH)
   void erase_flash_swap_page();

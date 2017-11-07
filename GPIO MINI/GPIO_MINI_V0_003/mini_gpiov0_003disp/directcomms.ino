@@ -22,7 +22,7 @@ void direct_serial_command()
     switch (CONSOLE_SERIALLink.read())
           {
           case 'A':
-                  direct_sendValues(0, direct_packetSize, 60);
+                  direct_sendValues(0, direct_packetSize, 60);   //(offset,packet size lenght,cmd)
           break; 
            
           case 'B': // Burn current values to eeprom
@@ -84,6 +84,7 @@ void direct_serial_command()
                 //theoffset = word(CONSOLE_SERIALLink.read(), tmp);
                 while (CONSOLE_SERIALLink.available() == 0) {}
                 direct_receiveValue(theoffset, CONSOLE_SERIALLink.read());
+      }         
           break;
      
           case 'r': 

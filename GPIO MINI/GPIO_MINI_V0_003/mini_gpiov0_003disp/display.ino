@@ -33,6 +33,10 @@ void driveDisplay()
 
 void initialise_display()
 {
+  #if defined DISP1_ACTIVE
   u8g2_1.begin();       
+  #endif
+  #if defined DISP2_ACTIVE
   u8g2_2.begin();
+  #endif
 }

@@ -6,16 +6,16 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //display module options . only choose one of the following defines for display selection  , comment out the unused ones 
 //set display 1 type
-#define DISP1_ACTIVE 
+#define DISP1_ACTIVE 1
 #define DISP1_USE_SSD1106_I2C
 //#define DISP1_USE_SSD1106_SPI
 //#define DISP1_USE_SSH1106_SPI
 
 //set display 2 type
-//#define DISP2_ACTIVE 
-//#define DISP2_USE_SSD1106_I2C
+//#define DISP2_ACTIVE 1 
+#define DISP2_USE_SSD1106_I2C
 //#define DISP2_USE_SSD1106_SPI
-#define DISP2_USE_SSH1106_SPI
+//#define DISP2_USE_SSH1106_SPI
 
 //set display size
 #define USE_128x64

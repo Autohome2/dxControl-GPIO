@@ -12,21 +12,20 @@
   #define BOARD_NR_GPIO_PINS 34
   
 #elif defined(STM32_MCU_SERIES) || defined(_VARIANT_ARDUINO_STM32_)
-  #define CORE_STM32
-  #define LED_BUILTIN PC13
-
-  //only choose one of the following two defines , comment out the unused ones
-  // #define USE_EXT_FLASH
-            #define EXT_FLASH_SIZE 8192
-            #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
-   #define USE_EXT_EEPROM
-  //#define USE_EXT_FRAM
+      #define CORE_STM32
+      #define LED_BUILTIN PC13
+      //only choose one of the following two defines , comment out the unused ones
+   // #define USE_EXT_FLASH
+      #define USE_EXT_EEPROM
+  //  #define USE_EXT_FRAM
   
+      #define EXT_FLASH_SIZE 8192
+      #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
 
-  extern "C" char* sbrk(int incr); //Used to freeRam
-  inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
-  #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
-  #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+      extern "C" char* sbrk(int incr); //Used to freeRam
+      inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
+      #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+      #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
 #else
   #error Incorrect board selected. Please select the correct board (Usually Mega 2560) and upload again
 #endif  
@@ -127,28 +126,28 @@ struct statuses {
   volatile byte secl; //Continous
   volatile byte systembits ;
   volatile unsigned int loopsPerSecond ;
- volatile  uint16_t freeRAM ;
- volatile uint8_t currentPage;
- volatile uint8_t testIO_hardware;//testIO_hardware
- uint16_t currentInputvalue[2];      //holds the analog input value for each conditional input , [0] first condition and [1] holds the second
- uint16_t currentInputvalueCond[3];  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
- uint8_t condition_pass[16];          // array stores pass/fail flags for the one or two(if selected) condition checks
- uint8_t condition_pass_last[16];     // array stores pass/fail flags for the one or two(if selected) condition checks
- uint8_t OutputPort[16];             //output port operating condition status flags
- volatile uint16_t digOut;        //bits showing digital output state(0-15)
- volatile uint16_t digOut_Active; // bits show if channel is used by board selected when pin value is < 255
- volatile uint16_t digOut_2;
- volatile uint16_t digOut_2_Active; // bits show if channel is used by board selected when pin value is < 255
- volatile uint16_t digIn;         // bits showing digital input state(0-15)
- volatile uint16_t digIn_Active;  // bits showing channel is used by board selected when pin value is < 255
- volatile uint16_t Analog[16];    // 16bit analog value data array for local analog(0-15)
- volatile uint16_t Analog_Active; // bits showing channel is used by board selected when pin value is < 255
- volatile uint16_t EXin[16];      // 16bit value data array for external analog(0-15)
+  volatile  uint16_t freeRAM ;
+  volatile uint8_t currentPage;
+  volatile uint8_t testIO_hardware;//testIO_hardware
+  uint16_t currentInputvalue[2];      //holds the analog input value for each conditional input , [0] first condition and [1] holds the second
+  uint16_t currentInputvalueCond[3];  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
+  uint8_t condition_pass[16];          // array stores pass/fail flags for the one or two(if selected) condition checks
+  uint8_t condition_pass_last[16];     // array stores pass/fail flags for the one or two(if selected) condition checks
+  uint8_t OutputPort[16];             //output port operating condition status flags
+  volatile uint16_t digOut;        //bits showing digital output state(0-15)
+  volatile uint16_t digOut_Active; // bits show if channel is used by board selected when pin value is < 255
+  volatile uint16_t digOut_2;
+  volatile uint16_t digOut_2_Active; // bits show if channel is used by board selected when pin value is < 255
+  volatile uint16_t digIn;         // bits showing digital input state(0-15)
+  volatile uint16_t digIn_Active;  // bits showing channel is used by board selected when pin value is < 255
+  volatile uint16_t Analog[16];    // 16bit analog value data array for local analog(0-15)
+  volatile uint16_t Analog_Active; // bits showing channel is used by board selected when pin value is < 255
+  volatile uint16_t EXin[16];      // 16bit value data array for external analog(0-15)
  
- volatile uint16_t dev1;          //developer use only
- volatile uint16_t dev2;          //developer use only
- volatile uint16_t dev3;          //developer use only
- volatile uint16_t dev4;          //developer use only
+  volatile uint16_t dev1;          //developer use only
+  volatile uint16_t dev2;          //developer use only
+  volatile uint16_t dev3;          //developer use only
+  volatile uint16_t dev4;          //developer use only
 };
 //struct statuses currentStatus; //The global status object
 
@@ -159,7 +158,7 @@ struct config1 {
 uint16_t master_controller_address:11 ;
 uint8_t pinLayout;
 uint8_t speeduinoConnection:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
-uint16_t speeduinoBaseCan :11;       //speeduino base can address
+uint16_t speeduinoBaseCan ;//:11;       //speeduino base can address
 uint8_t unused6;
 uint8_t unused7;
 uint8_t unused8;
@@ -214,18 +213,18 @@ byte unused124;
 byte unused125;
 byte unused126 = 226;
 byte unused127 = 227;
-//#if defined(CORE_AVR)
-//  };
-//#else
+#if defined(CORE_AVR)
+  };
+#else
   } __attribute__((__packed__)); //The 32 bi systems require all structs to be fully packed
-//#endif
+#endif
 
 //};
 
 //Page 2 of the config - See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
-struct __attribute__ ( ( packed ) ) config2 {
+struct config2 {
   uint8_t    port_Enabled[16];                // 1 if enabled 0 if not
   uint8_t    port_Condition[16];              // < is 60, = is 61, > is 62, & is 38
   uint8_t    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
@@ -284,7 +283,12 @@ byte unused2_252;
 byte unused2_253; 
 byte unused2_254;
 byte unused2_255; 
-};
+#if defined(CORE_AVR)
+  };
+#else
+  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+#endif
+//};
 
  //declare io pins
 byte pinOut[17]; //digital outputs array is +1 as pins start at 1 not 0

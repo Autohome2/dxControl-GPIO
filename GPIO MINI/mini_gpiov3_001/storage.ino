@@ -5,8 +5,11 @@
   #if defined (USE_EXT_FRAM)
     #include "Adafruit_FRAM_SPI.h"
   #endif
+  #if defined (USE_EXT_EEPROM)  
+    #include "stm32_ext_eeprom.h"
+  #endif   
 #endif
-#include "stm32_ext_eeprom.h"
+
 /*
 Takes the current configuration (config pages and maps)
 and writes them to EEPROM as per the layout defined in storage.h

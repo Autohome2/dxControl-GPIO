@@ -18,36 +18,35 @@
    #define USE_EXT_FLASH
    #define EXT_FLASH_SIZE 8192
    #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
-  // #define USE_EXT_SPI_EEPROM
-//  #define USE_EXT_FRAM
-  #define LED_BUILTIN PC13
+// #define USE_EXT_SPI_EEPROM
+// #define USE_EXT_FRAM
+   #define LED_BUILTIN PC13
 
-  extern "C" char* sbrk(int incr); //Used to freeRam
-  inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
-  #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
-  #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+   extern "C" char* sbrk(int incr); //Used to freeRam
+   inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
+   #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+   #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
 #else
-  #error Incorrect board selected. Please select the correct board (Usually Mega 2560) and upload again
+   #error Incorrect board selected. Please select the correct board (Usually Mega 2560) and upload again
 #endif  
 
 // now set specific processor compile flags
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
-  #define MEGA_AVR
+   #define MEGA_AVR
 
 #elif defined(ARDUINO_AVR_PRO)
-  #define 328_AVR
+   #define 328_AVR
 
 #elif defined(ARDUINO_Nucleo_64)
-  #define NUCLEO_64_STM32
+   #define NUCLEO_64_STM32
 
 #elif defined(MCU_STM32F103C8)
-  #define F108C8_STM32
+   #define F108C8_STM32
 
 #elif defined(MCU_STM32F407VGT6)
-  #define F407_STM32  
+   #define F407_STM32  
 
 #endif
-
 
 /*
  The "A" command allows you to specify where in the reltime data list you want the Speeduino to start sending you data from , and how many bytes you want to be sent.
@@ -155,15 +154,15 @@ struct statuses {
 //Page 1 of the config - See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
-struct __attribute__ ( ( packed ) ) config1 {
-uint16_t master_controller_address:10 ;
-byte pinLayout;
-byte speeduinoConnection;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
-uint16_t speeduinoBaseCan ;       //speeduino base can address
-byte unused6;
-byte unused7;
-byte unused8;
-byte unused9;
+struct config1 {
+uint16_t master_controller_address:11 ;
+uint8_t pinLayout;
+uint8_t speeduinoConnection :2;       //(2)type of connection to speedy , 0==none 1 == serial3 2 == canbus
+uint16_t speeduinoBaseCan;//:11;       //(11)speeduino base can address
+uint8_t unused6;
+uint8_t unused7;
+uint8_t unused8;
+uint8_t unused9;
 uint16_t DoutchanActive;          // digital outputchannels 1-16 active flags
 uint16_t DoutchanActive_2;        // digital output channels 17-32 active flags
 uint16_t DinchanActive;           // digital input channels 1-16 active flags
@@ -171,9 +170,9 @@ uint16_t DinchanActive_2;         // digital input channels 17-32 active flags
 uint16_t AinchanActive;           // analog input channels 1-16 active flags
 uint16_t AinchanActive_2;         // analog  input channels 17-32 active flags
 uint16_t exinsel;                 // External input channel enabled bit flags
-uint16_t INdata_from_Can[16];     // can address of source of data 0x100(256dec) to 0x7FF(2047dec) as 0 dec - 535 dec
-byte data_from_offset[16];        // offset of data source 0 - 255
-byte num_bytes[16];               // number of bytes length of data source 0,1,or 2
+uint16_t INdata_from_Can[16];//:11     // can address of source of data 0x100(256dec) to 0x7FF(2047dec) as 0 dec - 535 dec
+uint8_t data_from_offset[16];        // offset of data source 0 - 255
+uint8_t num_bytes[16];               // number of bytes length of data source 0,1,or 2
 byte unused88;
 byte unused89;
 byte unused90;
@@ -214,12 +213,17 @@ byte unused124;
 byte unused125;
 byte unused126 = 226;
 byte unused127 = 227;
-};
+
+#if defined(CORE_AVR)
+  };
+#else
+  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+#endif
 
 //Page 2 of the config - See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
-struct __attribute__ ( ( packed ) ) config2 {
+struct config2 {
   uint8_t    port_Enabled[16];                // 1 if enabled 0 if not
   uint8_t    port_Condition[16];              // < is 60, = is 61, > is 62, & is 38
   uint8_t    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
@@ -278,7 +282,13 @@ byte unused2_252;
 byte unused2_253; 
 byte unused2_254;
 byte unused2_255; 
-};
+
+#if defined(CORE_AVR)
+  };
+#else
+  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+#endif
+//};
 
  //declare io pins
 byte pinOut[17]; //digital outputs array is +1 as pins start at 1 not 0

@@ -130,7 +130,7 @@ void getExternalInput(uint8_t Xchan)
 
   if (((configPage1.INdata_from_Can[Xchan]&2047)+0x100) == ((configPage1.speeduinoBaseCan&2047)+0x100)) //if indata can address == speeduino base can address
       {
-       switch ((configPage1.speeduinoConnection&3))   //the bitwise & blanks off the unused upper 6 bits
+       switch ((configPage1.speeduinoConnection))//&3))   //the bitwise & blanks off the unused upper 6 bits
           {
           case 1:         //if direct connected to serial3?
           exOffset = configPage1.data_from_offset[Xchan];
