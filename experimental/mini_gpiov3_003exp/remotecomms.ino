@@ -67,14 +67,14 @@ void remote_serial_command()
                       tmp0 = SERIALLink.read();                //read in lsb of source can address 
                       tmp1 = SERIALLink.read();                     
                       Rdata = tmp1<<8 | tmp0 ;
-  // currentStatus.dev1 = Rdata;           //Rdata holds the source can address
-  // currentStatus.dev1 = configPage1.master_controller_address;//+256;    //master controller adress +256 == the gpio base can id
+   currentStatus.dev1 = Rdata;           //Rdata holds the source can address
+   currentStatus.dev2 = configPage1.master_controller_address+0x100 ;  //+256;    //master controller adress +256 == the gpio base can id
   //currentStatus.dev2 = canin_channel;
                   //    Rdata = word(SERIALLink.read(), tmp);   //read msb of source can address and combine it to make the 16bit value
                       if ((Rdata > (configPage1.master_controller_address+0x100))  && (Rdata < (configPage1.master_controller_address + 0x6FF)) )      //0x100 == 256dec , 0x7FF == 2047dec
                           {       
                             Rlocation = Rdata - (configPage1.master_controller_address+0x100);
-   currentStatus.dev2 = Rlocation;
+   currentStatus.EXin[14] = Rlocation;
                                   if (Rlocation <=32)         //1 - 32 are reserved for digital inputs
                                     {
                                       // input is digital

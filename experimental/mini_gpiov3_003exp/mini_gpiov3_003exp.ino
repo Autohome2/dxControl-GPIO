@@ -176,21 +176,22 @@ void loop()
         }
                       
       if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_4HZ)) //4 hertz
-        {
-             for (byte EXinchanloop = 0; EXinchanloop <16 ; EXinchanloop++)
-                {
-                 if (BIT_CHECK(configPage1.exinsel,EXinchanloop))
-                   {
-                    getExternalInput(EXinchanloop);
-                   }        // read the external inputs if enabled                           
-                }   
-
+        {   
+              if(BIT_CHECK(currentStatus.testIO_hardware, 0)) //if testenabled is set 
+                {   
+                  if(BIT_CHECK(currentStatus.testIO_hardware, 1) == 0) //and if testactive is clear 
+                    {
+                     BIT_CLEAR(currentStatus.testIO_hardware, 0);    //clear testenabled flag now all outputs have been forced
+                    }
+                }
+                
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_4HZ);                         
         }
 
       if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_10HZ)) //10 hertz
         {
+          driveDisplay();
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_10HZ);                         
         }
@@ -205,19 +206,13 @@ void loop()
               if (pinAin[Achan] < 255) {readAnalog(Achan);}        // if analog pin is in use read the analog inputs
              }
 
-          for (byte diginchanloop = 0; diginchanloop <16 ; diginchanloop++)
-            {
-             if (pinIn[diginchanloop] < 255) { readDigitalIn(diginchanloop);}        // if pin is not set to 0 then is in use so read the digital input
-          //      if (diginchanloop < 16)
-          //      {
-          //        diginchanloop++;
-          //      }
-          //    else
-          //      {
-          //        diginchanloop = 0;
-          //      }
-            }
-            
+          //for (byte diginchanloop = 0; diginchanloop <16 ; diginchanloop++)
+          //  {
+          //   if (pinIn[diginchanloop] < 255) { readDigitalIn(diginchanloop);}        // if pin is not set to 0 then is in use so read the digital input
+          //  }
+
+
+               
               if(!BIT_CHECK(currentStatus.testIO_hardware, 1))
                 {
                   for (byte Dinchan = 1; Dinchan <17 ; Dinchan++)
@@ -225,16 +220,18 @@ void loop()
                         if (pinIn[Dinchan] < 255) { readDigitalIn(Dinchan);}        // if pin is not set to 0 then is in use so read the digital input
                       }
                 }
-              driveOutputs();
- 
-              if(BIT_CHECK(currentStatus.testIO_hardware, 0)) //if testenabled is set 
-                {   
-                  if(BIT_CHECK(currentStatus.testIO_hardware, 1) == 0) //and if testactive is clear 
-                    {
-                     BIT_CLEAR(currentStatus.testIO_hardware, 0);    //clear testenabled flag now all outputs have been forced
-                    }
-                }   
-             
-             driveDisplay();    
-       }                  
+              driveOutputs();                    
+       }     
+       
+      if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_30HZ)) //30 hertz
+      {             
+        if (BIT_CHECK(configPage1.exinsel,EXinchanloop))        //if external input is active then read it
+          {
+            getExternalInput(EXinchanloop);
+          }        // read the external inputs if enabled                                        
+        if(EXinchanloop <16 ){EXinchanloop++;}                  //it takes approx 1 second to go through all 16 channels
+        else {EXinchanloop = 0;}
+        //Nothing here currently
+        BIT_CLEAR(TIMER_mask, BIT_TIMER_30HZ);        
+      }                    
 }
