@@ -211,7 +211,7 @@ void _write_flash_byte_address(uint32_t addr, uint8_t databyte)
   SPI.transfer(WB_WRITE_DISABLE);
   digitalWrite(slaveselectPin, HIGH);
   */
-  currentStatus.dev1 = databyte;
+  //currentStatus.dev1 = databyte;
   not_busy();
 }
 

@@ -22,11 +22,15 @@ void remote_serial_command()
           {
           case 'A':
                   while (SERIALLink.available() == 0) {}
-                  replylength = (SERIALLink.read());              //read in reply length
-                  for (byte rdata = 0; rdata < replylength; rdata++) //read x bytes of data according to replylength
-                      {
-                       realtimebuffer[rdata] = (SERIALLink.read());
-                      }
+                  //if (SERIALLink.available() >= 74)
+                  //  {
+                      currentStatus.dev2 = 55;
+                      replylength = 75;//(SERIALLink.read());              //read in reply length
+                      for (byte rdata = 0; rdata < replylength; rdata++) //read x bytes of data according to replylength
+                        {
+                          realtimebufferA[rdata] = (SERIALLink.read());
+                        }
+                 //   }               
           break;  
 
           case 'r':           
@@ -67,14 +71,14 @@ void remote_serial_command()
                       tmp0 = SERIALLink.read();                //read in lsb of source can address 
                       tmp1 = SERIALLink.read();                     
                       Rdata = tmp1<<8 | tmp0 ;
-   currentStatus.dev1 = Rdata;           //Rdata holds the source can address
-   currentStatus.dev2 = configPage1.master_controller_address+0x100 ;  //+256;    //master controller adress +256 == the gpio base can id
+   //currentStatus.dev1 = Rdata;           //Rdata holds the source can address
+   //currentStatus.dev2 = configPage1.master_controller_address+0x100 ;  //+256;    //master controller adress +256 == the gpio base can id
   //currentStatus.dev2 = canin_channel;
                   //    Rdata = word(SERIALLink.read(), tmp);   //read msb of source can address and combine it to make the 16bit value
                       if ((Rdata > (configPage1.master_controller_address+0x100))  && (Rdata < (configPage1.master_controller_address + 0x6FF)) )      //0x100 == 256dec , 0x7FF == 2047dec
                           {       
                             Rlocation = Rdata - (configPage1.master_controller_address+0x100);
-   currentStatus.EXin[14] = Rlocation;
+   //currentStatus.EXin[14] = Rlocation;
                                   if (Rlocation <=32)         //1 - 32 are reserved for digital inputs
                                     {
                                       // input is digital
@@ -131,37 +135,68 @@ void getExternalInput(uint8_t Xchan)
 {
   uint16_t exOffset;
   uint16_t exLength;
-   
-  //now lookup speeduino output offset from list based on can address 
-  //configPage1.speeduinoBaseCan holds the base address
 
-  if (((configPage1.INdata_from_Can[Xchan]&2047)+0x100) == ((configPage1.speeduinoBaseCan&2047)+0x100)) //if indata can address == speeduino base can address
-      {
-       switch ((configPage1.speeduinoConnection))//&3))   //the bitwise & blanks off the unused upper 6 bits
-          {
-          case 1:         //if direct connected to serial3?
-          exOffset = configPage1.data_from_offset[Xchan];
-          exLength = (configPage1.num_bytes[Xchan]&3);
+ currentStatus.EXin[10] = configPage1.canModuleConfig;  //configPage1.master_controller_address;
+ 
+ currentStatus.EXin[12] = ((configPage1.speeduinoBaseCan & 2047)+0x100);
 
-          SERIALLink.write(commandletterr);          // send command letter to the Speeduino
-          SERIALLink.write(tsCanId);                 // canid
-          SERIALLink.write((64+Xchan));                    // cmd
-          SERIALLink.write(lowByte(exOffset));
-          SERIALLink.write(highByte(exOffset));
-          SERIALLink.write(lowByte(exLength));
-          SERIALLink.write(highByte(exLength));      
+  if (Xchan != 0xFF)
+    { 
+      //now lookup speeduino output offset from list based on can address 
+      //configPage1.speeduinoBaseCan holds the base address
 
-         break;
+      if (((configPage1.INdata_from_Can[Xchan]&2047)+0x100) == ((configPage1.speeduinoBaseCan&2047)+0x100)) //if indata can address == speeduino base can address
+        {
+          switch ((configPage1.speeduinoConnection)&3)   //the bitwise & blanks off the unused upper 6 bits
+           {
+             case 1:         //if direct connected to serial3?
+              exOffset = configPage1.data_from_offset[Xchan];
+              exLength = (configPage1.num_bytes[Xchan]&3);
+              currentStatus.EXin[13] = configPage1.generalConfig1;   // BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST);
+              if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 1)
+                { 
+                  currentStatus.dev1 = Xchan;
+                  currentStatus.dev2 = 11;
+                  currentStatus.EXin[14] = exOffset;
+                  if (exLength == 1) //
+                    {
+                     currentStatus.EXin[Xchan] = realtimebufferA[exOffset];
+                    }
+                 if (exLength == 2) //
+                    {
+                      currentStatus.EXin[11] = (realtimebufferA[(exOffset+1)]<<8) | realtimebufferA[exOffset];
+                      currentStatus.EXin[Xchan] = (realtimebufferA[(exOffset+1)]<<8) | realtimebufferA[exOffset];  
+                    }
+                    
+                }
+              else if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 0)
+                {
+                  currentStatus.dev2 = 22;
+                  SERIALLink.write(commandletterr);          // send command letter to the Speeduino
+                  SERIALLink.write(tsCanId);                 // canid
+                  SERIALLink.write((64+Xchan));                    // cmd
+                  SERIALLink.write(lowByte(exOffset));
+                  SERIALLink.write(highByte(exOffset));
+                  SERIALLink.write(lowByte(exLength));
+                  SERIALLink.write(highByte(exLength));      
+                }
+            break;
 
-         case 2:
-          // send via canbus   
-         break;
-          }
-      }    
-   else if (((configPage1.INdata_from_Can[(Xchan-1)]&2047)+0x100) != ((configPage1.speeduinoBaseCan&2047)+0x100)) // base can address is not that of speeduino
-      {
-       //address is not speeduino so talk to the other device via canbus
-       //make canbus calls 
-      }
+            case 2:
+              // send via canbus   
+            break;
+            }
+        }    
+      else if (((configPage1.INdata_from_Can[(Xchan-1)]&2047)+0x100) != ((configPage1.speeduinoBaseCan&2047)+0x100)) // base can address is not that of speeduino
+        {
+          //address is not speeduino so talk to the other device via canbus
+          //make canbus calls 
+        }
+    }   
+  else      //Xchan == 0xFF
+    {
+      SERIALLink.write("A");
+      //currentStatus.dev2 = 33;
+    }
 
 }      

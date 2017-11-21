@@ -41,50 +41,75 @@ void writeConfig(uint8_t thePage)
     switch (thePage)
   {
 
-    case 1:
+  case 1:
   /*---------------------------------------------------
   | Config page 1 (See storage.h for data layout)
   | 128 byte long config table
   -----------------------------------------------------*/
   #if defined (CORE_AVR)
-  pnt_configPage = (uint8_t *)&configPage1; //Create a pointer to Page 1 in memory
+    pnt_configPage = (uint8_t *)&configPage1; //Create a pointer to Page 1 in memory
   #elif defined (CORE_STM32)
-  pnt_stm32_configPage = (uint8_t *)&configPage1; //Create a pointer to Page 1 in memory
+    pnt_stm32_configPage = (uint8_t *)&configPage1; //Create a pointer to Page 1 in memory
   #endif
   
-  for(uint16_t x = EEPROM_CONFIG1_START; x < EEPROM_CONFIG1_END ; x++)     //EEPROM_CONFIG1_END 
-  { 
-#if defined (CORE_AVR)
-    if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG1_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG1_START))); }
-#elif defined (CORE_STM32)//(MCU_STM32F103C8)
-  if(NVMEMread(x)!= *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG1_START))) 
-      {
-       NVMEMwrite(x, *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG1_START)),0); 
-      }      
-#endif
-  }
+    for(uint16_t x = EEPROM_CONFIG1_START; x < EEPROM_CONFIG1_END ; x++)     //EEPROM_CONFIG1_END 
+       { 
+        #if defined (CORE_AVR)
+          if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG1_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG1_START))); }
+        #elif defined (CORE_STM32)//(MCU_STM32F103C8)
+          if(NVMEMread(x)!= *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG1_START))) 
+            {
+              NVMEMwrite(x, *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG1_START)),0); 
+            }      
+        #endif
+       }
   
-    break;
+  break;
 
-    case 2:
+  case 2:
   /*---------------------------------------------------
   | Config page 2 (See storage.h for data layout)
   | 705 byte long config table
   -----------------------------------------------------*/
   #if defined (CORE_AVR)
-  pnt_configPage = (uint8_t *)&configPage2; //Create a pointer to Page 2 in memory
+    pnt_configPage = (uint8_t *)&configPage2; //Create a pointer to Page 2 in memory
   #elif defined (CORE_STM32)
-  pnt_stm32_configPage = (uint8_t *)&configPage2; //Create a pointer to Page 2 in memory
+    pnt_stm32_configPage = (uint8_t *)&configPage2; //Create a pointer to Page 2 in memory
   #endif
   
-  for(uint16_t x=EEPROM_CONFIG2_START; x<EEPROM_CONFIG2_END; x++) 
+    for(uint16_t x=EEPROM_CONFIG2_START; x<EEPROM_CONFIG2_END; x++) 
+       { 
+        #if defined (CORE_AVR)
+          if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))); }
+        #elif defined (CORE_STM32)//(MCU_STM32F103C8)
+          if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)))
+            {     
+              NVMEMwrite(x, *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)),0); 
+            }
+        #endif
+       }
+  
+  break;
+
+  case 3:
+  /*---------------------------------------------------
+  | Config page 3 (See storage.h for data layout)
+  | 256 byte long config table
+  -----------------------------------------------------*/
+  #if defined (CORE_AVR)
+  pnt_configPage = (uint8_t *)&configPage3; //Create a pointer to Page 2 in memory
+  #elif defined (CORE_STM32)
+  pnt_stm32_configPage = (uint8_t *)&configPage3; //Create a pointer to Page 2 in memory
+  #endif
+  
+  for(uint16_t x=EEPROM_CONFIG3_START; x<EEPROM_CONFIG3_END; x++) 
   { 
 #if defined (CORE_AVR)
-    if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))); }
+    if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG3_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG3_START))); }
 #elif defined (CORE_STM32)//(MCU_STM32F103C8)
-        if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)))
+        if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG3_START)))
           {     
-            NVMEMwrite(x, *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)),0); 
+            NVMEMwrite(x, *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG3_START)),0); 
           }
 #endif
   }
@@ -137,7 +162,21 @@ void loadConfig()
       }
   
   //That concludes the reading of config2
+
   
+  pnt_configPage = (uint8_t *)&configPage3; //Create a pointer to Page 3 in memory
+
+  for(uint16_t x=EEPROM_CONFIG3_START; x<EEPROM_CONFIG3_END; x++)        // x=500;x<754
+      { 
+      #if defined (CORE_AVR)
+          *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG3_START)) = EEPROM.read(x);
+    
+      #elif defined (CORE_STM32)    //(MCU_STM32F103C8)
+          *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG3_START)) = (uint8_t)NVMEMread(x);
+      #endif
+      }
+  
+  //That concludes the reading of config3
 }
 
 uint8_t NVMEMread(uint16_t address)
@@ -185,8 +224,8 @@ void NVMEMwrite(uint16_t address, uint8_t data_Byte, bool erase_flash)
   #endif
   
   #if defined (USE_EXT_EEPROM)
-   currentStatus.dev1 = address;
-   currentStatus.dev2 = data_Byte;
+   //currentStatus.dev1 = address;
+   //currentStatus.dev2 = data_Byte;
   _write_byte_address(address,data_Byte);
   #endif
   

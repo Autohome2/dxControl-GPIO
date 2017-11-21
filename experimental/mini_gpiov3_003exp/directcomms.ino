@@ -61,16 +61,17 @@ void direct_serial_command()
           break;
       
           case 'Q': // send code version
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                        {
-                        CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
-                        }
+                CONSOLE_SERIALLink.print("speeduino mini_GPIOV3.003 201711");
+                   // for (unsigned int sg = 0; sg < sizeof(GPIO_signature) - 1; sg++)
+                   //     {
+                   //     CONSOLE_SERIALLink.write(GPIO_signature[sg]);  
+                   //     }
           break;
           
           case 'S': // send code version
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                    for (unsigned int sg = 0; sg < sizeof(GPIO_RevNum) - 1; sg++)
                         {
-                        CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
+                        CONSOLE_SERIALLink.write(GPIO_RevNum[sg]);
                         currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
                         }
           break;
@@ -209,16 +210,17 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
     switch (commandletter)
            {
            case 15:    //
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                        {
-                        CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
-                        }  
+                    CONSOLE_SERIALLink.print("speeduino mini_GPIOV3.003 201711");
+                    //for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
+                    //    {
+                    //    CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
+                    //    }  
            break;
                         
            case 14:  //
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                    for (unsigned int sg = 0; sg < sizeof(GPIO_RevNum) - 1; sg++)
                         {
-                        CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
+                        CONSOLE_SERIALLink.write(GPIO_RevNum[sg]);
                         currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
                         }     
            break;
@@ -282,7 +284,15 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
         *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
       }
       break;
-  
+
+    case 3: //canbus config Page:
+      pnt_configPage = &configPage3; //Setup a pointer to the relevant config page
+     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+      if ( rvOffset < page_3_size)
+      {
+        *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
+      }
+      break;
   }
 }
 
@@ -321,6 +331,14 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
                 }
             break;
 
+            case canbus_config:  //port editor config Page:
+                {
+                // currentTitleIndex = 27;
+
+                pnt_configPage = &configPage3; //Create a pointer to Page 3 in memory  
+                  send_page_Length = page_3_size; 
+                }
+            break;
           }
     
           //All other bytes can simply be copied from the config table
@@ -348,6 +366,7 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
           }
       
 }
+
 /*
 This function is used to store calibration data sent by Tuner Studio.
 */
@@ -356,98 +375,114 @@ void direct_receiveCalibration(byte tableID)
 
 }
 
+/*
+ this function reads the realtime data into the fullStatus array
+*/
+ void direct_read_realtime()
+ {
+  fullStatus[0] = currentStatus.secl; //secl is simply a counter that increments each second. Used to track unexpected resets (Which will reset this count to 0)
+  fullStatus[1] = currentStatus.systembits; //Squirt Bitfield
+  fullStatus[2] = currentStatus.canstatus;  //canstatus Bitfield
+  fullStatus[3] = lowByte(currentStatus.loopsPerSecond);
+  fullStatus[4] = highByte(currentStatus.loopsPerSecond);
+    //The following can be used to show the amount of free memory
+  currentStatus.freeRAM = freeRam();
+  fullStatus[5] = lowByte(currentStatus.freeRAM); //(byte)((currentStatus.loopsPerSecond >> 8) & 0xFF);
+  fullStatus[6] = highByte(currentStatus.freeRAM);
+  fullStatus[7] = lowByte(mainLoopCount);
+  fullStatus[8] = highByte(mainLoopCount);
+  fullStatus[9] = lowByte(currentStatus.dev1);
+  fullStatus[10] = highByte(currentStatus.dev1);
+  fullStatus[11] = lowByte(currentStatus.dev2);
+  fullStatus[12] = highByte(currentStatus.dev2);
+  fullStatus[13] = currentStatus.testIO_hardware;
+  fullStatus[14] = lowByte(currentStatus.digIn);
+  fullStatus[15] = highByte(currentStatus.digIn);
+  fullStatus[16] = lowByte(currentStatus.digOut);    
+  fullStatus[17] = highByte(currentStatus.digOut);
+  fullStatus[18] = lowByte(currentStatus.Analog[0]);
+  fullStatus[19] = highByte(currentStatus.Analog[0]);
+  fullStatus[20] = lowByte(currentStatus.Analog[1]);
+  fullStatus[21] = highByte(currentStatus.Analog[1]);
+  fullStatus[22] = lowByte(currentStatus.Analog[2]);
+  fullStatus[23] = highByte(currentStatus.Analog[2]);
+  fullStatus[24] = lowByte(currentStatus.Analog[3]);
+  fullStatus[25] = highByte(currentStatus.Analog[3]);  
+  fullStatus[26] = lowByte(currentStatus.Analog[4]);
+  fullStatus[27] = highByte(currentStatus.Analog[4]);
+  fullStatus[28] = lowByte(currentStatus.Analog[5]);
+  fullStatus[29] = highByte(currentStatus.Analog[5]);
+  fullStatus[30] = lowByte(currentStatus.Analog[6]);
+  fullStatus[31] = highByte(currentStatus.Analog[6]);
+  fullStatus[32] = lowByte(currentStatus.Analog[7]);
+  fullStatus[33] = highByte(currentStatus.Analog[7]);
+  fullStatus[34] = lowByte(currentStatus.Analog[8]);
+  fullStatus[35] = highByte(currentStatus.Analog[8]);
+  fullStatus[36] = lowByte(currentStatus.Analog[9]);
+  fullStatus[37] = highByte(currentStatus.Analog[9]);
+  fullStatus[38] = lowByte(currentStatus.Analog[10]);
+  fullStatus[39] = highByte(currentStatus.Analog[10]);
+  fullStatus[40] = lowByte(currentStatus.Analog[11]);
+  fullStatus[41] = highByte(currentStatus.Analog[11]);  
+  fullStatus[42] = lowByte(currentStatus.Analog[12]);
+  fullStatus[43] = highByte(currentStatus.Analog[12]);
+  fullStatus[44] = lowByte(currentStatus.Analog[13]);
+  fullStatus[45] = highByte(currentStatus.Analog[13]);
+  fullStatus[46] = lowByte(currentStatus.Analog[14]);
+  fullStatus[47] = highByte(currentStatus.Analog[14]);
+  fullStatus[48] = lowByte(currentStatus.Analog[15]);
+  fullStatus[49] = highByte(currentStatus.Analog[15]);    
+  fullStatus[50] = lowByte(currentStatus.EXin[0]);
+  fullStatus[51] = highByte(currentStatus.EXin[0]);
+  fullStatus[52] = lowByte(currentStatus.EXin[1]);
+  fullStatus[53] = highByte(currentStatus.EXin[1]);
+  fullStatus[54] = lowByte(currentStatus.EXin[2]);
+  fullStatus[55] = highByte(currentStatus.EXin[2]);
+  fullStatus[56] = lowByte(currentStatus.EXin[3]);
+  fullStatus[57] = highByte(currentStatus.EXin[3]);  
+  fullStatus[58] = lowByte(currentStatus.EXin[4]);
+  fullStatus[59] = highByte(currentStatus.EXin[4]);
+  fullStatus[60] = lowByte(currentStatus.EXin[5]);
+  fullStatus[61] = highByte(currentStatus.EXin[5]);
+  fullStatus[62] = lowByte(currentStatus.EXin[6]);
+  fullStatus[63] = highByte(currentStatus.EXin[6]);
+  fullStatus[64] = lowByte(currentStatus.EXin[7]);
+  fullStatus[65] = highByte(currentStatus.EXin[7]);
+  fullStatus[66] = lowByte(currentStatus.EXin[8]);
+  fullStatus[67] = highByte(currentStatus.EXin[8]);
+  fullStatus[68] = lowByte(currentStatus.EXin[9]);
+  fullStatus[69] = highByte(currentStatus.EXin[9]);
+  fullStatus[70] = lowByte(currentStatus.EXin[10]);
+  fullStatus[71] = highByte(currentStatus.EXin[10]);
+  fullStatus[72] = lowByte(currentStatus.EXin[11]);
+  fullStatus[73] = highByte(currentStatus.EXin[11]);  
+  fullStatus[74] = lowByte(currentStatus.EXin[12]);
+  fullStatus[75] = highByte(currentStatus.EXin[12]);
+  fullStatus[76] = lowByte(currentStatus.EXin[13]);
+  fullStatus[77] = highByte(currentStatus.EXin[13]);
+  fullStatus[78] = lowByte(currentStatus.EXin[14]);
+  fullStatus[79] = highByte(currentStatus.EXin[14]);
+  fullStatus[80] = lowByte(currentStatus.EXin[15]);
+  fullStatus[81] = highByte(currentStatus.EXin[15]); 
+ // fullStatus[82] = lowByte(currentStatus.dev3);
+ // fullStatus[83] = highByte(currentStatus.dev3);
+ // fullStatus[84] = lowByte(currentStatus.dev4);
+ // fullStatus[85] = highByte(currentStatus.dev4);   
+  
+ }
+
+/*
+this function sends the reltime data to TS
+*/ 
 void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
 {
   
-  byte fullStatus[direct_packetSize];
   byte response[packetLength];
 
     if(direct_requestCount == 0) { currentStatus.secl = 0; }
     direct_requestCount++;
 
-  fullStatus[0] = currentStatus.secl; //secl is simply a counter that increments each second. Used to track unexpected resets (Which will reset this count to 0)
-  fullStatus[1] = currentStatus.systembits; //Squirt Bitfield
-  fullStatus[2] = lowByte(currentStatus.loopsPerSecond);
-  fullStatus[3] = highByte(currentStatus.loopsPerSecond);
-    //The following can be used to show the amount of free memory
-  currentStatus.freeRAM = freeRam();
-  fullStatus[4] = lowByte(currentStatus.freeRAM); //(byte)((currentStatus.loopsPerSecond >> 8) & 0xFF);
-  fullStatus[5] = highByte(currentStatus.freeRAM);
-  fullStatus[6] = lowByte(mainLoopCount);
-  fullStatus[7] = highByte(mainLoopCount);
-  fullStatus[8] = lowByte(currentStatus.dev1);
-  fullStatus[9] = highByte(currentStatus.dev1);
-  fullStatus[10] = lowByte(currentStatus.dev2);
-  fullStatus[11] = highByte(currentStatus.dev2);
-  fullStatus[12] = currentStatus.testIO_hardware;
-  fullStatus[13] = lowByte(currentStatus.digIn);
-  fullStatus[14] = highByte(currentStatus.digIn);
-  fullStatus[15] = lowByte(currentStatus.digOut);    
-  fullStatus[16] = highByte(currentStatus.digOut);
-  fullStatus[17] = lowByte(currentStatus.Analog[0]);
-  fullStatus[18] = highByte(currentStatus.Analog[0]);
-  fullStatus[19] = lowByte(currentStatus.Analog[1]);
-  fullStatus[20] = highByte(currentStatus.Analog[1]);
-  fullStatus[21] = lowByte(currentStatus.Analog[2]);
-  fullStatus[22] = highByte(currentStatus.Analog[2]);
-  fullStatus[23] = lowByte(currentStatus.Analog[3]);
-  fullStatus[24] = highByte(currentStatus.Analog[3]);  
-  fullStatus[25] = lowByte(currentStatus.Analog[4]);
-  fullStatus[26] = highByte(currentStatus.Analog[4]);
-  fullStatus[27] = lowByte(currentStatus.Analog[5]);
-  fullStatus[28] = highByte(currentStatus.Analog[5]);
-  fullStatus[29] = lowByte(currentStatus.Analog[6]);
-  fullStatus[30] = highByte(currentStatus.Analog[6]);
-  fullStatus[31] = lowByte(currentStatus.Analog[7]);
-  fullStatus[32] = highByte(currentStatus.Analog[7]);
-  fullStatus[33] = lowByte(currentStatus.Analog[8]);
-  fullStatus[34] = highByte(currentStatus.Analog[8]);
-  fullStatus[35] = lowByte(currentStatus.Analog[9]);
-  fullStatus[36] = highByte(currentStatus.Analog[9]);
-  fullStatus[37] = lowByte(currentStatus.Analog[10]);
-  fullStatus[38] = highByte(currentStatus.Analog[10]);
-  fullStatus[39] = lowByte(currentStatus.Analog[11]);
-  fullStatus[40] = highByte(currentStatus.Analog[11]);  
-  fullStatus[41] = lowByte(currentStatus.Analog[12]);
-  fullStatus[42] = highByte(currentStatus.Analog[12]);
-  fullStatus[43] = lowByte(currentStatus.Analog[13]);
-  fullStatus[44] = highByte(currentStatus.Analog[13]);
-  fullStatus[45] = lowByte(currentStatus.Analog[14]);
-  fullStatus[46] = highByte(currentStatus.Analog[14]);
-  fullStatus[47] = lowByte(currentStatus.Analog[15]);
-  fullStatus[48] = highByte(currentStatus.Analog[15]);    
-  fullStatus[49] = lowByte(currentStatus.EXin[0]);
-  fullStatus[50] = highByte(currentStatus.EXin[0]);
-  fullStatus[51] = lowByte(currentStatus.EXin[1]);
-  fullStatus[52] = highByte(currentStatus.EXin[1]);
-  fullStatus[53] = lowByte(currentStatus.EXin[2]);
-  fullStatus[54] = highByte(currentStatus.EXin[2]);
-  fullStatus[55] = lowByte(currentStatus.EXin[3]);
-  fullStatus[56] = highByte(currentStatus.EXin[3]);  
-  fullStatus[57] = lowByte(currentStatus.EXin[4]);
-  fullStatus[58] = highByte(currentStatus.EXin[4]);
-  fullStatus[59] = lowByte(currentStatus.EXin[5]);
-  fullStatus[60] = highByte(currentStatus.EXin[5]);
-  fullStatus[61] = lowByte(currentStatus.EXin[6]);
-  fullStatus[62] = highByte(currentStatus.EXin[6]);
-  fullStatus[63] = lowByte(currentStatus.EXin[7]);
-  fullStatus[64] = highByte(currentStatus.EXin[7]);
-  fullStatus[65] = lowByte(currentStatus.EXin[8]);
-  fullStatus[66] = highByte(currentStatus.EXin[8]);
-  fullStatus[67] = lowByte(currentStatus.EXin[9]);
-  fullStatus[68] = highByte(currentStatus.EXin[9]);
-  fullStatus[69] = lowByte(currentStatus.EXin[10]);
-  fullStatus[70] = highByte(currentStatus.EXin[10]);
-  fullStatus[71] = lowByte(currentStatus.EXin[11]);
-  fullStatus[72] = highByte(currentStatus.EXin[11]);  
-  fullStatus[73] = lowByte(currentStatus.EXin[12]);
-  fullStatus[74] = highByte(currentStatus.EXin[12]);
-  fullStatus[75] = lowByte(currentStatus.EXin[13]);
-  fullStatus[76] = highByte(currentStatus.EXin[13]);
-  fullStatus[77] = lowByte(currentStatus.EXin[14]);
-  fullStatus[78] = highByte(currentStatus.EXin[14]);
-  fullStatus[79] = lowByte(currentStatus.EXin[15]);
-  fullStatus[80] = highByte(currentStatus.EXin[15]);    
+    direct_read_realtime();
   
     for(byte x=0; x<packetLength; x++)
   {

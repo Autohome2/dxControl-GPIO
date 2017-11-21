@@ -48,32 +48,20 @@
 
 #endif
 
-/*
- The "A" command allows you to specify where in the reltime data list you want the Speeduino to start sending you data from , and how many bytes you want to be sent.
- The format is "A" where
- A == the main command
+//Define masks for CanStatus
+#define BIT_CANSTATUS_CAN0ACTIVATED         0  //can0 has enabled
+#define BIT_CANSTATUS_CAN0FAILED            1  //can0 failed to configure
+#define BIT_CANSTATUS_CAN1ACTIVATED         2  //can1 has enabled
+#define BIT_CANSTATUS_CAN1FAILED            3  //can1 failed o configure
+#define BIT_CANSTATUS_CAN0MSGFAIL           4 //
+#define BIT_CANSTATUS_CAN1MSGFAIL           5  //
+#define BIT_CANSTATUS_7                     6       //
+#define BIT_CANSTATUS_8                     7  //
 
- Speeduino replies with 
- "A" == confirming the command sent
- reply length == a single byte with a value of the number of bytes it will be sending
- xx bytes == the number of data bytes according to the replylength.
-*/
- 
-/*
- The "r" command allows you to specify where in the reltime data list you want the Speeduino to start sending you data from , and how many bytes you want to be sent.
- The format is "r\$tsCanId\x30%2o%2c" where
- r == the main command
- tsCanId == the canid of the device being called
- x30 == dec48 the optimised output command
- 2o == 2 bytes of offset
- 2c == 2 bytes of length
+//define maskes for generalConfig1
+#define USE_REALTIME_BROADCAST              0
+//#define unused1_7b                          1
 
- Speeduino replies with 
- "r" == confirming the command sent
- reply length == a single byte with a value of the number of bytes it will be sending
- xx bytes == the number of data bytes according to the replylength.
-  
- */
 #define maincommand  'r'    // the command to send to the Speeduino
 #define commandletterr  'r'
 uint8_t tsCanId = 0;          // this is the tunerstudio canID for the device you are requesting data from , this is 0 for the main ecu in the system which is usually the speeduino ecu . 
@@ -81,22 +69,15 @@ uint8_t tsCanId = 0;          // this is the tunerstudio canID for the device yo
 //uint16_t realtime_offset = 4;  // the offset of the realtime data to start reading from
 //uint16_t realtime_bytes = 1;   // the number of bytes requested
 
-/*
-change the realtime_offset to what offset position you wish to read the realtime data from
-eg : realtime_offset = 4 , this relates to the currentStatus.MAP
-This is 1 byte long so if this is the only byte you want to read set realtime_bytes to 1
+const unsigned char GPIO_signature[]    = "speeduino_mini_GPIOV3.003 201711"; //this must match the ini
+const unsigned char GPIO_RevNum[] = "speeduino 201711-mini GPIO V3.003";      //this is what is displayed in the TS header bar
 
-eg : realtime_offset = 8 , this relates to the  currentStatus.battery10 (battery voltage)
-this is 1 byte long.
-if you set realtime_bytes = 2
-then you will also be sent offset 9 too which is currentStatus.O2
- */
-const unsigned char simple_remote_signature[]    = "speeduino_mini_GPIOV0.003 201706"; //this must match the ini
-const unsigned char simple_remote_RevNum[] = "speeduino 201706-mini GPIO V0.003";      //this is what is displayed in the TS header bar
 uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
+
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
 const uint8_t page_1_size = 128;
 const uint16_t page_2_size = 256;
+const uint16_t page_3_size = 256;
 volatile uint8_t swap_page = 0; // current external flash swap page number
 volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when all written
 
@@ -125,6 +106,7 @@ volatile byte LOOP_TIMER;
 struct statuses {
   volatile byte secl; //Continous
   volatile byte systembits ;
+  volatile byte canstatus;    //canstatus bitfield
   volatile unsigned int loopsPerSecond ;
   volatile  uint16_t freeRAM ;
   volatile uint8_t currentPage;
@@ -158,10 +140,10 @@ struct statuses {
 struct config1 {
 uint16_t master_controller_address:11 ;
 uint8_t pinLayout;
-uint8_t speeduinoConnection:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
+uint8_t speeduinoConnection ;//:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
 uint16_t speeduinoBaseCan ;//:11;       //speeduino base can address
-uint8_t unused6;
-uint8_t unused7;
+uint8_t canModuleConfig;                //bit flags for canmodule configuration
+uint8_t generalConfig1;
 uint8_t unused8;
 uint8_t unused9;
 uint16_t DoutchanActive;          // digital outputchannels 1-16 active flags
@@ -291,6 +273,226 @@ byte unused2_255;
 #endif
 //};
 
+//Page 3 of the config - See the ini file for further reference
+//this is laid out as first the byte size data then the words
+
+struct config3 {
+uint8_t canbroadcast_out;  
+uint16_t canbroadcast_sel;
+uint16_t canbroadcast_source_can_address[16];
+uint16_t canbroadcast_chan_offset[16];
+uint8_t canbroadcast_chan_size[16];
+uint8_t canbroadcast_chan_canid[16];
+//byte unused3_53;
+//byte unused3_54;
+//byte unused3_55;
+//byte unused3_56;
+//byte unused3_57;
+//byte unused3_58;
+//byte unused3_59;
+//byte unused3_60;
+//byte unused3_61;
+//byte unused3_62;
+//byte unused3_63;
+//byte unused3_64;
+//byte unused3_65;
+//byte unused3_66;
+//byte unused3_67;
+//byte unused3_68;
+//byte unused3_69;
+//byte unused3_70;
+//byte unused3_71;
+//byte unused3_72;
+//byte unused3_73;
+//byte unused3_74;
+//byte unused3_75;
+//byte unused3_76;
+//byte unused3_77;
+//byte unused3_78;
+//byte unused3_79;
+//byte unused3_80;
+//byte unused3_81;
+//byte unused3_82;
+//byte unused3_83;
+//byte unused3_84;
+//byte unused3_85;
+//byte unused3_86;
+//byte unused3_87;
+//byte unused3_88;
+//byte unused3_89;
+//byte unused3_90;
+//byte unused3_91;
+//byte unused3_92;
+//byte unused3_93;
+//byte unused3_94;
+//byte unused3_95;
+//byte unused3_96;
+//byte unused3_97;
+//byte unused3_98;
+byte unused3_99 = 99;
+byte unused3_100;
+byte unused3_101;
+byte unused3_102;
+byte unused3_103;
+byte unused3_104;
+byte unused3_105 = 105;
+byte unused3_106;
+byte unused3_107;
+byte unused3_108;
+byte unused3_109;
+byte unused3_110;
+byte unused3_111;
+byte unused3_112;
+byte unused3_113;
+byte unused3_114;
+byte unused3_115;
+byte unused3_116;
+byte unused3_117;
+byte unused3_118;
+byte unused3_119;
+byte unused3_120 = 200;
+byte unused3_121;
+byte unused3_122;
+byte unused3_123;
+byte unused3_124;
+byte unused3_125;
+byte unused3_126 = 226;
+byte unused3_127 = 227;
+byte unused3_128;
+byte unused3_129;
+byte unused3_130 = 200;
+byte unused3_131;
+byte unused3_132;
+byte unused3_133;
+byte unused3_134;
+byte unused3_135;
+byte unused3_136 = 236;
+byte unused3_137 = 237;
+byte unused3_138;
+byte unused3_139;
+byte unused3_140;
+byte unused3_141;
+byte unused3_142;
+byte unused3_143;
+byte unused3_144;
+byte unused3_145;
+byte unused3_146;
+byte unused3_147;
+byte unused3_148;
+byte unused3_149;
+byte unused3_150;
+byte unused3_151;
+byte unused3_152;
+byte unused3_153;
+byte unused3_154;
+byte unused3_155;
+byte unused3_156;
+byte unused3_157;
+byte unused3_158;
+byte unused3_159;
+byte unused3_160;
+byte unused3_161;
+byte unused3_162;
+byte unused3_163;
+byte unused3_164;
+byte unused3_165;
+byte unused3_166;
+byte unused3_167;
+byte unused3_168;
+byte unused3_169;
+byte unused3_170;
+byte unused3_171;
+byte unused3_172;
+byte unused3_173;
+byte unused3_174;
+byte unused3_175;
+byte unused3_176;
+byte unused3_177;
+byte unused3_178;
+byte unused3_179;
+byte unused3_180;
+byte unused3_181;
+byte unused3_182;
+byte unused3_183;
+byte unused3_184;
+byte unused3_185;
+byte unused3_186;
+byte unused3_187;
+byte unused3_188;
+byte unused3_189;
+byte unused3_190;
+byte unused3_191;
+byte unused3_192;
+byte unused3_193;
+byte unused3_194;
+byte unused3_195;
+byte unused3_196;
+byte unused3_197;
+byte unused3_198;
+byte unused3_199;
+byte unused3_200 = 200;
+byte unused3_201;
+byte unused3_202;
+byte unused3_203;
+byte unused3_204;
+byte unused3_205;
+byte unused3_206 = 206;
+byte unused3_207 = 207;  
+byte unused3_208;
+byte unused3_209;
+byte unused3_210;
+byte unused3_211;
+byte unused3_212;
+byte unused3_213;
+byte unused3_214;
+byte unused3_215;
+byte unused3_216;
+byte unused3_217;
+byte unused3_218;
+byte unused3_219;
+byte unused3_220;
+byte unused3_221;
+byte unused3_222;
+byte unused3_223;
+byte unused3_224;
+byte unused3_225;
+byte unused3_226;
+byte unused3_227;
+byte unused3_228;
+byte unused3_229;
+byte unused3_230;
+byte unused3_231;
+byte unused3_232;
+byte unused3_233;
+byte unused3_234;
+byte unused3_235;
+byte unused3_236;
+byte unused3_237;
+byte unused3_238;
+byte unused3_239;
+byte unused3_240;
+byte unused3_241;
+byte unused3_242;
+byte unused3_243;
+byte unused3_244;
+byte unused3_245;
+byte unused3_246;
+byte unused3_247;
+byte unused3_248;
+byte unused3_249;
+byte unused3_250;
+byte unused3_251;
+byte unused3_252;
+byte unused3_253; 
+byte unused3_254;
+byte unused3_255; 
+
+#if defined(CORE_AVR)
+  };
+#else
+  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+#endif
+  
  //declare io pins
 byte pinOut[17]; //digital outputs array is +1 as pins start at 1 not 0
 
@@ -303,6 +505,7 @@ byte pinAin[17]; //analog inputs
 extern struct statuses currentStatus; // from passthrough.ino
 extern struct config1 configPage1;  
 extern struct config2 configPage2;
+extern struct config3 configPage3;
 
 //extern unsigned long currentLoopTime; //The time the current loop started (uS)
 //extern unsigned long previousLoopTime; //The time the previous loop started (uS)
