@@ -330,8 +330,9 @@ uint8_t canbroadcast_chan_canid[16];
 //byte unused3_97;
 //byte unused3_98;
 byte unused3_99 = 99;
-byte unused3_100;
-byte unused3_101;
+//byte unused3_100;
+//byte unused3_101;
+uint16_t gpio_obd_address;             //GPIO OBD diagnostic address  
 byte unused3_102;
 byte unused3_103;
 byte unused3_104;

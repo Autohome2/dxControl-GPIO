@@ -30,8 +30,10 @@ A full copy of the license may be found in the speeduino projects root directory
 #include <Wire.h>
 
 #include <mcp_can.h>
-    MCP_CAN CAN0(11);    //create instance of mcp can as can1
-    MCP_CAN CAN1(12);   // create instance of mcp_can as can2
+  #define CAN0_INT   2    // Set INT to pin 2
+  #define CAN1_INT   3    // Set INT to pin 3
+  MCP_CAN CAN0(11);      // Set CS to pin 11
+  MCP_CAN CAN1(12);    //  Set CS to pin 12
 
 #include <U8g2lib.h>
 
@@ -137,10 +139,10 @@ void setup() {
    {
     initialiseCAN0();     //init can interface 0
    } 
- //if (BIT_CHECK(configPage1.canModuleConfig,1))
- //  {  
- //   initialiseCAN1();    //init can interface 1
- //  }
+ if (BIT_CHECK(configPage1.canModuleConfig,1))
+   {  
+    initialiseCAN1();    //init can interface 1
+   }
  CONSOLE_SERIALLink.begin(115200);
  SERIALLink.begin(115200);  
     
@@ -172,6 +174,16 @@ void loop()
               {
                 direct_serial_command();
               }
+   if(!digitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
+  {
+    CAN0_INT_routine() ;
+  }
+  
+   if(!digitalRead(CAN1_INT))                         // If CAN1_INT pin is low, read receive buffer
+  {
+    CAN1_INT_routine();
+  }
+  
          BIT_CLEAR(TIMER_mask, BIT_TIMER_25HZ);
          }
           
@@ -202,14 +214,17 @@ void loop()
                 }
               
             //  currentStatus.dev1 = configPage3.canbroadcast_out;
-            //  currentStatus.dev2 = configPage3.canbroadcast_sel;  
-              if(BIT_CHECK(configPage3.canbroadcast_out, 0) == 1)
-                {
-                  if(BIT_CHECK(configPage3.canbroadcast_sel, 0) == 1)
+            //  currentStatus.dev2 = configPage3.canbroadcast_sel; 
+              for (byte Bchan = 0; Bchan <16 ; Bchan++)
+                 { 
+                  if(BIT_CHECK(configPage3.canbroadcast_out, Bchan) == 1)
                     {
-                      Send_CAN0_message(0);
-                    }  
-                }        
+                     if(BIT_CHECK(configPage3.canbroadcast_sel, Bchan) == 1)
+                       {
+                        Send_CAN0_message(Bchan,0,0);
+                       }  
+                    }
+                 }           
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_4HZ);                         
         }
@@ -217,7 +232,8 @@ void loop()
       if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_10HZ)) //10 hertz
         {
           driveDisplay();
-          if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 1)
+          //if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 1)
+          if (configPage1.exinsel !=0)  //if any of the external input channels are enabled
             {
               // send an "A" request
               getExternalInput(0xFF);

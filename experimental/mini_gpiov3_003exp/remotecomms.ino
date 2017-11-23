@@ -24,8 +24,9 @@ void remote_serial_command()
                   while (SERIALLink.available() == 0) {}
                   //if (SERIALLink.available() >= 74)
                   //  {
-                      currentStatus.dev2 = 55;
-                      replylength = 75;//(SERIALLink.read());              //read in reply length
+                      
+                      replylength = (SERIALLink.read());              //read in reply length
+                      currentStatus.dev2 = replylength;
                       for (byte rdata = 0; rdata < replylength; rdata++) //read x bytes of data according to replylength
                         {
                           realtimebufferA[rdata] = (SERIALLink.read());
@@ -136,9 +137,8 @@ void getExternalInput(uint8_t Xchan)
   uint16_t exOffset;
   uint16_t exLength;
 
- currentStatus.EXin[10] = configPage1.canModuleConfig;  //configPage1.master_controller_address;
- 
- currentStatus.EXin[12] = ((configPage1.speeduinoBaseCan & 2047)+0x100);
+ //currentStatus.EXin[10] = configPage1.canModuleConfig;  //configPage1.master_controller_address;
+ //currentStatus.EXin[12] = ((configPage1.speeduinoBaseCan & 2047)+0x100);
 
   if (Xchan != 0xFF)
     { 
@@ -152,34 +152,30 @@ void getExternalInput(uint8_t Xchan)
              case 1:         //if direct connected to serial3?
               exOffset = configPage1.data_from_offset[Xchan];
               exLength = (configPage1.num_bytes[Xchan]&3);
-              currentStatus.EXin[13] = configPage1.generalConfig1;   // BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST);
-              if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 1)
-                { 
-                  currentStatus.dev1 = Xchan;
-                  currentStatus.dev2 = 11;
-                  currentStatus.EXin[14] = exOffset;
+             // currentStatus.EXin[13] = configPage1.generalConfig1;   // BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST);
+              //if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 1)
+              //  { 
                   if (exLength == 1) //
                     {
                      currentStatus.EXin[Xchan] = realtimebufferA[exOffset];
                     }
                  if (exLength == 2) //
                     {
-                      currentStatus.EXin[11] = (realtimebufferA[(exOffset+1)]<<8) | realtimebufferA[exOffset];
-                      currentStatus.EXin[Xchan] = (realtimebufferA[(exOffset+1)]<<8) | realtimebufferA[exOffset];  
+                     currentStatus.EXin[Xchan] = (realtimebufferA[(exOffset+1)]<<8) | realtimebufferA[exOffset];  
                     }
                     
-                }
-              else if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 0)
-                {
-                  currentStatus.dev2 = 22;
-                  SERIALLink.write(commandletterr);          // send command letter to the Speeduino
-                  SERIALLink.write(tsCanId);                 // canid
-                  SERIALLink.write((64+Xchan));                    // cmd
-                  SERIALLink.write(lowByte(exOffset));
-                  SERIALLink.write(highByte(exOffset));
-                  SERIALLink.write(lowByte(exLength));
-                  SERIALLink.write(highByte(exLength));      
-                }
+              //  }
+              //else if(BIT_CHECK(configPage1.generalConfig1, USE_REALTIME_BROADCAST) == 0)
+              //  {
+              //    currentStatus.dev2 = 22;
+              //    SERIALLink.write(commandletterr);          // send command letter to the Speeduino
+              //    SERIALLink.write(tsCanId);                 // canid
+              //    SERIALLink.write((64+Xchan));                    // cmd
+              //    SERIALLink.write(lowByte(exOffset));
+              //    SERIALLink.write(highByte(exOffset));
+              //    SERIALLink.write(lowByte(exLength));
+              //    SERIALLink.write(highByte(exLength));      
+              //  }
             break;
 
             case 2:

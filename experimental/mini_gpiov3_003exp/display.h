@@ -7,14 +7,14 @@
 //display module options . only choose one of the following defines for display selection  , comment out the unused ones 
 //set display 1 type
 #define DISP1_ACTIVE 1              // 1 if in use or comment out
-#define DISP1_ROUTE 0               // direct i2c == 0 , remote == mux address
+#define DISP1_ROUTE  0               // direct i2c == 0 , remote == mux address
 #define DISP1_USE_SSD1106_I2C
 //#define DISP1_USE_SSD1106_SPI
 //#define DISP1_USE_SSH1106_SPI
 
 //set display 2 type
 //#define DISP2_ACTIVE 1 
-#define DISP2_ROUTE 0               // direct i2c == 0 , remote == mux address
+#define DISP2_ROUTE  0               // direct i2c == 0 , remote == mux address
 #define DISP2_USE_SSD1106_I2C
 //#define DISP2_USE_SSD1106_SPI
 //#define DISP2_USE_SSH1106_SPI
