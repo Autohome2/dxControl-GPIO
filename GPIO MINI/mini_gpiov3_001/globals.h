@@ -157,7 +157,7 @@ struct statuses {
 struct config1 {
 uint16_t master_controller_address:11 ;
 uint8_t pinLayout;
-uint8_t speeduinoConnection:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
+uint8_t speeduinoConnection;//:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
 uint16_t speeduinoBaseCan ;//:11;       //speeduino base can address
 uint8_t unused6;
 uint8_t unused7;

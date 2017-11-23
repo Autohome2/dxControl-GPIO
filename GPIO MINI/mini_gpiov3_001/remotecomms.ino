@@ -22,10 +22,10 @@ void remote_serial_command()
           {
           case 'A':
                   while (SERIALLink.available() == 0) {}
-                  replylength = (SERIALLink.read());              //read in reply length
+                  replylength = 75;//(SERIALLink.read());              //read in reply length
                   for (byte rdata = 0; rdata < replylength; rdata++) //read x bytes of data according to replylength
                       {
-                       realtimebuffer[rdata] = (SERIALLink.read());
+                       realtimebufferA[rdata] = (SERIALLink.read());
                       }
           break;  
 
@@ -134,34 +134,49 @@ void getExternalInput(uint8_t Xchan)
    
   //now lookup speeduino output offset from list based on can address 
   //configPage1.speeduinoBaseCan holds the base address
+  
+  if (Xchan != 0xFF)
+    { 
+      if (((configPage1.INdata_from_Can[Xchan]&2047)+0x100) == ((configPage1.speeduinoBaseCan&2047)+0x100)) //if indata can address == speeduino base can address
+        {
+          switch ((configPage1.speeduinoConnection)&3)   //the bitwise & blanks off the unused upper 6 bits
+            {
+              case 1:         //if direct connected to serial3?
+                    exOffset = configPage1.data_from_offset[Xchan];
+                    exLength = (configPage1.num_bytes[Xchan]&3);
+                    if (exLength == 1) //
+                      {
+                        currentStatus.EXin[Xchan] = realtimebufferA[exOffset];
+                      }
+                    if (exLength == 2) //
+                      {
+                        currentStatus.EXin[Xchan] = (realtimebufferA[(exOffset+1)]<<8) | realtimebufferA[exOffset];  
+                      }
+                      //SERIALLink.write(commandletterr);          // send command letter to the Speeduino
+                      //SERIALLink.write(tsCanId);                 // canid
+                      //SERIALLink.write((64+Xchan));                    // cmd
+                      //SERIALLink.write(lowByte(exOffset));
+                      //SERIALLink.write(highByte(exOffset));
+                      //SERIALLink.write(lowByte(exLength));
+                      //SERIALLink.write(highByte(exLength));      
 
-  if (((configPage1.INdata_from_Can[Xchan]&2047)+0x100) == ((configPage1.speeduinoBaseCan&2047)+0x100)) //if indata can address == speeduino base can address
-      {
-       switch ((configPage1.speeduinoConnection))//&3))   //the bitwise & blanks off the unused upper 6 bits
-          {
-          case 1:         //if direct connected to serial3?
-          exOffset = configPage1.data_from_offset[Xchan];
-          exLength = (configPage1.num_bytes[Xchan]&3);
+              break;
 
-          SERIALLink.write(commandletterr);          // send command letter to the Speeduino
-          SERIALLink.write(tsCanId);                 // canid
-          SERIALLink.write((64+Xchan));                    // cmd
-          SERIALLink.write(lowByte(exOffset));
-          SERIALLink.write(highByte(exOffset));
-          SERIALLink.write(lowByte(exLength));
-          SERIALLink.write(highByte(exLength));      
-
-         break;
-
-         case 2:
-          // send via canbus   
-         break;
-          }
-      }    
-   else if (((configPage1.INdata_from_Can[(Xchan-1)]&2047)+0x100) != ((configPage1.speeduinoBaseCan&2047)+0x100)) // base can address is not that of speeduino
-      {
-       //address is not speeduino so talk to the other device via canbus
-       //make canbus calls 
-      }
+              case 2:
+                      // send via canbus   
+              break;
+            }
+        }    
+      else if (((configPage1.INdata_from_Can[(Xchan-1)]&2047)+0x100) != ((configPage1.speeduinoBaseCan&2047)+0x100)) // base can address is not that of speeduino
+        {
+         //address is not speeduino so talk to the other device via canbus
+         //make canbus calls 
+        }
+    }   
+  else      //Xchan == 0xFF
+    {
+      SERIALLink.write("A");
+      //currentStatus.dev2 = 33;
+    }
 
 }      

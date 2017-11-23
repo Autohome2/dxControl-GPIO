@@ -148,10 +148,8 @@ void loop()
           if (SERIALLink.available() > 0)      // if SERIALLink has data then do the remote serial command subroutine
             {
               remote_serial_command();
-            }
-        //}     
-       // if ( ((mainLoopCount & 31) == 1) or (Serial.available() > 32) )
-          //{
+            }             
+       // if ( ((mainLoopCount & 31) == 1) or (Serial.available() > 32) )          
             if (CONSOLE_SERIALLink.available() > 0)      // if CONSOLE_SERIALLink has data then do the direct serial command subroutine(Typical TS link)
               {
                 direct_serial_command();
@@ -191,11 +189,17 @@ void loop()
 
       if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_10HZ)) //10 hertz
         {
+           driveDisplay(); 
+           if (configPage1.exinsel !=0)  //if any of the external input channels are enabled
+             {
+              // send an "A" request
+              getExternalInput(0xFF);
+             }
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_10HZ);                         
         }
 
-              if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_15HZ)) //15 hertz
+      if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_15HZ)) //15 hertz
         {
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_15HZ);
@@ -234,7 +238,6 @@ void loop()
                      BIT_CLEAR(currentStatus.testIO_hardware, 0);    //clear testenabled flag now all outputs have been forced
                     }
                 }   
-             
-             driveDisplay();    
+                
        }                  
 }
