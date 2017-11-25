@@ -89,17 +89,22 @@ volatile byte EXinchanloop;
 #if defined DISP1_ACTIVE
     #if defined DISP1_USE_SSD1106_I2C
         U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_1(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);   
+    #elif defined DISP1_USE_SSD1306_I2C 
+        U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_1(U8G2_R0, /* reset=*/ DISPLAY1_RESET);
     #elif defined DISP1_USE_SSD1106_SPI
         U8G2_SSD1306_128X64_NONAME_1_4W_HW_SPI u8g2_1(U8G2_R0, /* cs=*/ DISPLAY1_CS, /* dc=*/ DISPLAY1_DC, /* reset=*/ DISPLAY1_RESET);     
     #elif defined DISP1_USE_SSH1106_SPI
         U8G2_SH1106_128X64_NONAME_1_4W_HW_SPI u8g2_1(U8G2_R0, /* cs=*/ DISPLAY1_CS, /* dc=*/ DISPLAY1_DC, /* reset=*/ DISPLAY1_RESET);    
+
     #endif
 #endif    
 
 //configure screen 2 display initialise options
 #if defined DISP2_ACTIVE
     #if defined DISP2_USE_SSD1106_I2C
-        U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);   
+        U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE); 
+    #elif defined DISP2_USE_SSD1306_I2C 
+        U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_2(U8G2_R0, /* reset=*/ DISPLAY2_RESET);          
     #elif defined DISP2_USE_SSD1106_SPI
         U8G2_SSD1306_128X64_NONAME_1_4W_HW_SPI u8g2_2(U8G2_R0, /* cs=*/ DISPLAY2_CS, /* dc=*/ DISPLAY2_DC, /* reset=*/ DISPLAY2_RESET);     
     #elif defined DISP2_USE_SSH1106_SPI
