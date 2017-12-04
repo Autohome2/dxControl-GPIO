@@ -76,7 +76,18 @@ void direct_serial_command()
           break;
 
           case 'V': // send VE table and constants in binary
-                  direct_sendPage(0,thistsCanId,0);
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tmp = CONSOLE_SERIALLink.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
+               // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tmp = CONSOLE_SERIALLink.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                thelength = (CONSOLE_SERIALLink.read()<<8) | tmp;
+ 
+                direct_sendPage(theoffset,thelength,thistsCanId,0);
+                //  direct_sendPage(0,thistsCanId,0);
           break;
 
           case 'W': // receive new VE obr constant at 'W'+<offset>+<newbyte>
@@ -234,6 +245,7 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
 
            case 66: // r version of B == 0x42
                     // Burn current values to eeprom
+                    currentStatus.currentPage = byte(theoffset);
                     writeConfig(currentStatus.currentPage);
            break;
            
@@ -246,7 +258,8 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
            break;
           
            case 86:  //r version of V == dec86
-                  direct_sendPage(thelength,thistsCanId,86);
+                  //direct_sendPage(thelength,thistsCanId,86);
+                  direct_sendPage(theoffset,thelength,thistsCanId,86);
            break;
                     
            case 87:  //r version of W(0x57)
@@ -293,7 +306,7 @@ into a buffer and sends it.
 Note that some translation of the data is required to lay it out in the way Megasqurit / TunerStudio expect it
 useChar - If true, all values are send as chars, this is for the serial command line interface. TunerStudio expects data as raw values, so this must be set false in that case
 */
-void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
+void direct_sendPage(uint16_t send_page_offset, uint16_t send_page_Length, byte can_id, byte cmd)
 {
 
  //currentPage = pagenum;
@@ -308,7 +321,7 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
                 // currentTitleIndex = 27;
 
                 pnt_configPage = &configPage1; //Create a pointer to Page 1 in memory  
-                  send_page_Length = page_1_size; 
+                  //send_page_Length = page_1_size; 
                 }
             break;  
 
@@ -317,7 +330,7 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
                 // currentTitleIndex = 27;
 
                 pnt_configPage = &configPage2; //Create a pointer to Page 2 in memory  
-                  send_page_Length = page_2_size; 
+                  //send_page_Length = page_2_size; 
                 }
             break;
 
@@ -328,7 +341,8 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
           uint8_t response[send_page_Length];
           for ( uint16_t x = 0; x < send_page_Length; x++)
             {
-              response[x] = *((uint8_t *)pnt_configPage + (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
+             // response[x] = *((uint8_t *)pnt_configPage + (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
+            response[x] = *((uint8_t *)pnt_configPage +(uint16_t)(send_page_offset)+ (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
             }
 
           if (cmd == 206)   //came via passthrough from serial3

@@ -16,7 +16,7 @@ unsigned long direct_requestCount = 0; //The number of times the A command has b
 void direct_serial_command();
 void dodirect_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset, uint16_t thelength);
 void direct_receiveValue(uint16_t rvOffset, uint8_t newValue);
-void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd);
+void direct_sendPage(uint16_t send_page_offset,uint16_t send_page_Length, byte can_id, byte cmd);
 void direct_sendValues(uint16_t offset, uint16_t packetLength, byte cmd);
 void commandButtons(uint16_t cmdCombined);
 
