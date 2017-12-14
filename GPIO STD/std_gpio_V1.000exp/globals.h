@@ -63,9 +63,41 @@
 #define BIT_CANSTATUS_7                     6       //
 #define BIT_CANSTATUS_8                     7  //
 
-//define maskes for generalConfig1
+// define masks for canModuleConfig;
+#define CAN0ENABLE                          0
+#define CAN1ENABLE                          1
+
+// define maskes for generalConfig1
 #define USE_REALTIME_BROADCAST              0
-//#define unused1_7b                          1
+//#define unused1_7b                        1
+
+//define masks for canbroadcast_config
+#define GENERIC_BROADCAST                   0       // enable_canbroadcast_out  = bits,   U08,     0, [0:0], "Off", "On"
+#define REMOTE_OUT0_15                      1       // enable_remoteoutput0_15  = bits,   U08,     0, [1:1], "Off", "On"
+#define REMOTE_OUT16_31                     2       // enable_remoteoutput16_31 = bits,   U08,     0, [2:2], "Off", "On"
+#define REMOTE_IN0_15                       3       // enable_remoteinput0_15   = bits,   U08,     0, [3:3], "Off", "On"
+#define REMOTE_IN16_31                      4       // enable_remoteinput16_31  = bits,   U08,     0, [4:4], "Off", "On"
+#define REMOTE_AIN0_15                      5       // enable_remoteAinput0_15 
+
+//define masks for remote output status
+#define REMOTE_OUT_OFF                      0
+#define REMOTE_OUT_ON                       1
+#define REMOTE_OUT_OPENCIRCUIT              2
+#define REMOTE_OUT_SHORTCIRCUIT             3
+#define REMOTE_OUT_THERMALOVERLOAD          4
+#define REMOTE_OUT_CURRENTOVERLOAD          5
+#define REMOTE_OUT_unused6                  6
+#define REMOTE_OUT_unused7                  7
+
+//define masks for remote input status
+#define REMOTE_IN_OFF                      0
+#define REMOTE_IN_ON                       1
+#define REMOTE_IN_OPENCIRCUIT              2
+#define REMOTE_IN_SHORTCIRCUIT             3
+#define REMOTE_IN_THERMALOVERLOAD          4
+#define REMOTE_IN_CURRENTOVERLOAD          5
+#define REMOTE_IN_unused6                  6
+#define REMOTE_IN_unused7                  7
 
 #define maincommand  'r'    // the command to send to the Speeduino
 #define commandletterr  'r'
@@ -79,21 +111,23 @@ const unsigned char GPIO_RevNum[]       = "speeduino 201711-mini GPIO V3.003";  
 
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
 const uint8_t page_1_size = 128;
-const uint16_t page_2_size = 256;
+const uint16_t page_2_size = 704;
 const uint16_t page_3_size = 256;
-const uint16_t page_4_size = 320;
+const uint16_t page_4_size = 334;
 
 volatile uint8_t swap_page = 0; // current external flash swap page number
 volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when all written
 
 byte zero = 0;
-byte tmp;         //used in assembling incoming serial data ints
-uint16_t theoffset, thelength;  //used with serial data
+volatile byte tmp;         //used in assembling incoming serial data ints
+volatile uint16_t theoffset, thelength;  //used with serial data
+#define addressoffset     0x100
 
 //Handy bitsetting macros
-#define BIT_SET(a,b) ((a) |= (1<<(b)))
-#define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
-#define BIT_CHECK(var,pos) ((var) & (1<<(pos)))               //gives and answer of the decimal value of the binary position being tested if was 1.
+#define BIT_SET(a,b)        ((a) |= (1<<(b)))
+#define BIT_CLEAR(a,b)      ((a) &= ~(1<<(b)))
+#define BIT_WRITE(a,b,c)    (bitWrite(a,b,c))
+#define BIT_CHECK(var,pos)  ((var) & (1<<(pos)))               //gives and answer of the decimal value of the binary position being tested if was 1.
 #define BIT_sCHECK(var,pos) (((var) & (1<<(pos)))>>pos)       // gives a 1 or 0 answer according to if the bit at pos was 1 or 0
 
 #define BIT_TIMER_1HZ             0
@@ -116,14 +150,17 @@ struct statuses {
   volatile byte secl; //Continous
   volatile byte systembits ;
   volatile byte canstatus;    //canstatus bitfield
+  volatile uint8_t remote_output_status[32];    //remote output condition status bitfield
   volatile unsigned int loopsPerSecond ;
   volatile  uint16_t freeRAM ;
   volatile uint8_t currentPage;
   volatile uint8_t testIO_hardware;//testIO_hardware
   uint16_t currentInputvalue[2];      //holds the analog input value for each conditional input , [0] first condition and [1] holds the second
-  uint16_t currentInputvalueCond[3];  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
-  uint8_t condition_pass[16];          // array stores pass/fail flags for the one or two(if selected) condition checks
-  uint8_t condition_pass_last[16];     // array stores pass/fail flags for the one or two(if selected) condition checks
+  uint16_t currentInputvalueCond[5];  //holds the vlaue of the test condition and link condition for current channel being checked
+  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
+  uint8_t condition_pass[32];          // array stores pass/fail flags for the one or two(if selected) condition checks
+  uint8_t condition_pass_last[32];     // array stores pass/fail flags for the one or two(if selected) condition checks
+  bool condition_all_pass;
   uint8_t OutputPort[16];             //output port operating condition status flags
   volatile uint16_t digOut;        //bits showing digital output state(0-15)
   volatile uint16_t digOut_Active; // bits show if channel is used by board selected when pin value is < 255
@@ -219,63 +256,76 @@ byte unused127 = 227;
 
 struct config2 {
   uint8_t    port_Enabled[16];                // 1 if enabled 0 if not
-  uint8_t    port_Condition[16];              // < is 60, = is 61, > is 62, & is 38
+  uint8_t    port_Condition[32];              // < is 60, = is 61, > is 62, & is 38
   uint8_t    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
   uint8_t    port_InitValue[16];              // 1 on 0 off
   uint8_t    port_PortValue[16];              // 1 if active high 0 if active low
-  uint8_t    port_OutSize[16];                // unsure of purpose but must be present
-  uint16_t   port_OutOffset[16];              // port offset refers to the offset value from the output channels
-  uint16_t    port_Threshold[16];              // threshhold value for on/off
-  uint16_t    port_Hysteresis[16];             // hysteresis value for on/off
-  uint8_t    port_CanId[16];                  // TScanid of the device the output channel is from  
-byte unused2_208;
-byte unused2_209;
-byte unused2_210;
-byte unused2_211;
-byte unused2_212;
-byte unused2_213;
-byte unused2_214;
-byte unused2_215;
-byte unused2_216;
-byte unused2_217;
-byte unused2_218;
-byte unused2_219;
-byte unused2_220;
-byte unused2_221;
-byte unused2_222;
-byte unused2_223;
-byte unused2_224;
-byte unused2_225;
-byte unused2_226;
-byte unused2_227;
-byte unused2_228;
-byte unused2_229;
-byte unused2_230;
-byte unused2_231;
-byte unused2_232;
-byte unused2_233;
-byte unused2_234;
-byte unused2_235;
-byte unused2_236;
-byte unused2_237;
-byte unused2_238;
-byte unused2_239;
-byte unused2_240;
-byte unused2_241;
-byte unused2_242;
-byte unused2_243;
-byte unused2_244;
-byte unused2_245;
-byte unused2_246;
-byte unused2_247;
-byte unused2_248;
-byte unused2_249;
-byte unused2_250;
-byte unused2_251;
-byte unused2_252;
-byte unused2_253; 
-byte unused2_254;
-byte unused2_255; 
+  uint8_t    port_OutSize[32];                // unsure of purpose but must be present
+  uint16_t   port_OutOffset[32];              // port offset refers to the offset value from the output channels
+  uint16_t   port_Threshold[32];              // threshhold value for on/off
+  uint16_t   port_Hysteresis[32];             // hysteresis value for on/off
+  uint8_t    port_CanId[32];                  // TScanid of the device the output channel is from
+
+ // uint8_t    port_edit1_spare[111];           //spare to allow for editor 1 to go to 2 condition later
+    
+  uint8_t    port_Enabled_2[16];                // 1 if enabled 0 if not
+  uint8_t    port_Condition_2[32];              // < is 60, = is 61, > is 62, & is 38
+  uint8_t    port_Condition_relationship_2[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
+  uint8_t    port_InitValue_2[16];              // 1 on 0 off
+  uint8_t    port_PortValue_2[16];              // 1 if active high 0 if active low
+  uint8_t    port_OutSize_2[32];                // unsure of purpose but must be present
+  uint16_t   port_OutOffset_2[32];              // port offset refers to the offset value from the output channels
+  uint16_t   port_Threshold_2[32];              // threshhold value for on/off
+  uint16_t   port_Hysteresis_2[32];             // hysteresis value for on/off
+  uint8_t    port_CanId_2[32];                  // TScanid of the device the output channel is from 
+//byte unused2_208;
+//byte unused2_209;
+//byte unused2_210;
+//b/yte unused2_211;
+//byte unused2_212;
+//byte unused2_213;
+//byte unused2_214;
+//byte unused2_215;
+//byte unused2_216;
+//byte unused2_217;
+//byte unused2_218;
+//byte unused2_219;
+//byte unused2_220;
+//byte unused2_221;
+//byte unused2_222;
+//byte unused2_223;
+//byte unused2_224;
+//byte unused2_225;
+//byte unused2_226;
+//byte unused2_227;
+//byte unused2_228;
+//byte unused2_229;
+//byte unused2_230;
+//byte unused2_231;
+//byte unused2_232;
+//byte unused2_233;
+//byte unused2_234;
+//byte unused2_235;
+//byte unused2_236;
+//byte unused2_237;
+//byte unused2_238;
+//byte unused2_239;
+///byte unused2_240;
+//byte unused2_241;
+//byte unused2_242;
+//by//te unused2_243;
+//byte unused2_244;
+//byte unused2_245;
+//byte unused2_246;
+//byte unused2_247;
+//byte unused2_248;
+//byte unused2_249;
+//byte unused2_250;
+//byte unused2_251;
+//byte unused2_252;
+//byte unused2_253; 
+//byte unused2_254;
+//byte unused2_255; 
 #if defined(CORE_AVR)
   };
 #else
@@ -294,12 +344,11 @@ uint16_t canbroadcast_chan_offset[16];
 uint8_t canbroadcast_chan_size[16];
 uint8_t canbroadcast_chan_canid[16];
 byte unused3_99 = 99;
-
-uint16_t gpio_obd_address;             //GPIO OBD diagnostic address 
 uint8_t canbroadcast_freq[16]; 
-
-byte unused3_118;
-byte unused3_119;
+uint16_t gpio_obd_address;             //GPIO OBD diagnostic address
+uint16_t speeduino_obd_address;             //speeduino OBD diagnostic address
+//byte unused3_118;
+//byte unused3_119;
 byte unused3_120 = 200;
 byte unused3_121;
 byte unused3_122;
@@ -450,12 +499,14 @@ uint16_t remoteoutput_sel_0_16;
 uint16_t remoteoutput_sel_17_31;
 uint16_t remoteoutput_can_address[32];
 uint8_t  remoteoutput_port[32];
+uint16_t remoteoutput_statusEnable_0_16;
+uint16_t remoteoutput_statusEnable_17_31;
+uint8_t  remoteoutput_freq[32];
 uint16_t remoteinput_sel_0_16;
 uint16_t remoteinput_sel_17_31;
 uint16_t remoteinput_can_address[32];
 uint8_t  remoteinput_port[32];
 uint8_t  remoteinput_freq[32];  
-
 uint16_t remoteAninput_sel;
 uint16_t remoteAninput_can_address[16];
 uint8_t  remoteAninput_port[16];
@@ -489,34 +540,28 @@ uint8_t  remoteAninput_freq[16];
 //byte unused4_225;
 //byte unused4_226;
 //byte unused4_297;
-byte unused4_298;
-byte unused4_299;
-byte unused4_300;
-byte unused4_301;
-byte unused4_302;
-byte unused4_303;
-byte unused4_304;
-byte unused4_305;
-byte unused4_306;
-byte unused4_307;
-byte unused4_308;
-byte unused4_309;
-byte unused4_310;
-byte unused4_311;
-byte unused4_312;
-byte unused4_313;
-byte unused4_314;
-byte unused4_315;
-byte unused4_316;
-byte unused4_317;
-byte unused4_318;
-byte unused4_319;
-//byte unused4_320;
-//byte unused4_251;
-//byte unused4_252;
-//byte unused4_253; 
-//byte unused4_254;
-//byte unused4_255; 
+//byte unused4_298;
+//byte unused4_299;
+//byte unused4_300;
+//byte unused4_301;
+//byte unused4_302;
+//byte unused4_303;
+//byte unused4_304;
+//byte unused4_305;
+//byte unused4_306;
+//byte unused4_307;
+//byte unused4_308;
+//byte unused4_309;
+//byte unused4_310;
+//byte unused4_311;
+//byte unused4_312;
+//byte unused4_313;
+//byte unused4_314;
+//byte unused4_315;/
+//b/yte unused4_316;
+//byte unused4_317;
+//byte unused4_318;
+//byte unused4_319;
 
 #if defined(CORE_AVR)
   };
@@ -526,11 +571,11 @@ byte unused4_319;
 
   
  //declare io pins
-byte pinOut[32]; //digital outputs array is +1 as pins start at 1 not 0
+byte pinOut[33]; //digital outputs array is +1 as pins start at 1 not 0
 
-byte pinIn[32];  //digital inputs
+byte pinIn[33];  //digital inputs array is +1 as pins start at 1 not 0
 
-byte pinAin[17]; //analog inputs
+byte pinAin[17]; //analog inputs array is +1 as pins start at 1 not 0
 
 
 // global variables // from passthrough_example.ino

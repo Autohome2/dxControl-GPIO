@@ -33,17 +33,17 @@ Current layout of EEPROM data (Version 3) is as follows (All sizes are in bytes)
 | 10    |128  | configPage1
 | 200   |256  | configpage2
 | 500   |256  | configPage3
-| 700   |256  | configPage4
+| 800   |256  | configPage4
 */
 
 #define EEPROM_CONFIG1_START 10
 #define EEPROM_CONFIG1_END 138     // 128 slots
 #define EEPROM_CONFIG2_START 200
-#define EEPROM_CONFIG2_END 456     //256 slots
-#define EEPROM_CONFIG3_START 500
-#define EEPROM_CONFIG3_END 756     //256 slots
-#define EEPROM_CONFIG4_START 800
-#define EEPROM_CONFIG4_END 1121     //321 slots
+#define EEPROM_CONFIG2_END 904     //704 slots
+#define EEPROM_CONFIG3_START 1000
+#define EEPROM_CONFIG3_END 1256     //256 slots
+#define EEPROM_CONFIG4_START 1300
+#define EEPROM_CONFIG4_END 1634     //334 slots
 
 byte EEPROM_loc;
 

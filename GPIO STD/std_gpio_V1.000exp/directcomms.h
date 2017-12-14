@@ -8,8 +8,8 @@
 #define canbus_config              3 // canbus configuration page
 #define remotecanio_config         4 // canbus remote input and output page
 
-byte direct_packetSize = 82;
-volatile byte fullStatus[82];//[direct_packetSize];
+byte direct_packetSize = 86;
+volatile byte fullStatus[86];//[direct_packetSize];
 
 unsigned long direct_requestCount = 0; //The number of times the A command has been issued
 
@@ -17,7 +17,7 @@ void direct_serial_command();
 void dodirect_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset, uint16_t thelength);
 void direct_receiveValue(uint16_t rvOffset, uint8_t newValue);
 void direct_sendPage(uint16_t send_page_offset,uint16_t send_page_Length, byte can_id, byte cmd);
- void direct_read_realtime();
+void direct_read_realtime();
 void direct_sendValues(uint16_t offset, uint16_t packetLength, byte cmd);
 void commandButtons(uint16_t cmdCombined);
 

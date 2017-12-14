@@ -24,7 +24,8 @@ void writeConfig(uint8_t thePage)
  // int offset;
   //Create a pointer to the config page
   
-  void* pnt_configPage;//This only stores the address of the value that it's pointing to and not the max size
+  //void* pnt_configPage;//This only stores the address of the value that it's pointing to and not the max size
+  byte* pnt_configPage;
   void* pnt_stm32_configPage;//This only stores the address of the value that it's pointing to and not the max size
 
 #if defined (CORE_AVR)  
@@ -80,7 +81,8 @@ void writeConfig(uint8_t thePage)
     for(uint16_t x=EEPROM_CONFIG2_START; x<EEPROM_CONFIG2_END; x++) 
        { 
         #if defined (CORE_AVR)
-          if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))); }
+          //if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))); }
+            if(EEPROM.read(x) != *(pnt_configPage + byte(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *(pnt_configPage + byte(x - EEPROM_CONFIG2_START)));}
         #elif defined (CORE_STM32)//(MCU_STM32F103C8)
           if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)))
             {     
@@ -106,6 +108,8 @@ void writeConfig(uint8_t thePage)
   { 
 #if defined (CORE_AVR)
     if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG3_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG3_START))); }
+    //if(EEPROM.read(x) != *(pnt_configPage + byte(x - EEPROM_CONFIG3_START))) { EEPROM.write(x, *(pnt_configPage + byte(x - EEPROM_CONFIG3_START)));}
+    
 #elif defined (CORE_STM32)//(MCU_STM32F103C8)
         if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG3_START)))
           {     
@@ -131,6 +135,8 @@ void writeConfig(uint8_t thePage)
   { 
 #if defined (CORE_AVR)
     if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG4_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG4_START))); }
+    //if(EEPROM.read(x) != *(pnt_configPage + byte(x - EEPROM_CONFIG4_START))) { EEPROM.write(x, *(pnt_configPage + byte(x - EEPROM_CONFIG4_START)));}
+    
 #elif defined (CORE_STM32)//(MCU_STM32F103C8)
         if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG4_START)))
           {     
@@ -181,10 +187,10 @@ void loadConfig()
   for(uint16_t x=EEPROM_CONFIG2_START; x<EEPROM_CONFIG2_END; x++)        // x=200;x<454
       { 
       #if defined (CORE_AVR)
-          *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)) = EEPROM.read(x);
+          *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START)) = EEPROM.read(x);     // note the uint16_t instead of 8 this is due to the page going over 256!
     
       #elif defined (CORE_STM32)    //(MCU_STM32F103C8)
-          *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)) = (uint8_t)NVMEMread(x);
+          *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START)) = (uint8_t)NVMEMread(x);
       #endif
       }
   
@@ -205,15 +211,15 @@ void loadConfig()
   
   //That concludes the reading of config3
 
-    pnt_configPage = (uint8_t *)&configPage4; //Create a pointer to Page 4 in memory
+  pnt_configPage = (uint8_t *)&configPage4; //Create a pointer to Page 4 in memory
 
-  for(uint16_t x=EEPROM_CONFIG4_START; x<EEPROM_CONFIG4_END; x++)        // x=800;x<1056
+  for(uint16_t x=EEPROM_CONFIG4_START; x<EEPROM_CONFIG4_END; x++)        // x=800;x<1156
       { 
       #if defined (CORE_AVR)
-          *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG4_START)) = EEPROM.read(x);
+          *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG4_START)) = EEPROM.read(x);     // note the uint16_t instead of 8 this is due to the page going over 256!
     
       #elif defined (CORE_STM32)    //(MCU_STM32F103C8)
-          *((uint8_t *)pnt_configPage + (uint8_t)(x - EEPROM_CONFIG4_START)) = (uint8_t)NVMEMread(x);
+          *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG4_START)) = (uint8_t)NVMEMread(x);
       #endif
       }
   

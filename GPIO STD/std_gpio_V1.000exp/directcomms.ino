@@ -425,72 +425,76 @@ void direct_receiveCalibration(byte tableID)
   fullStatus[13] = currentStatus.testIO_hardware;
   fullStatus[14] = lowByte(currentStatus.digIn);
   fullStatus[15] = highByte(currentStatus.digIn);
-  fullStatus[16] = lowByte(currentStatus.digOut);    
-  fullStatus[17] = highByte(currentStatus.digOut);
-  fullStatus[18] = lowByte(currentStatus.Analog[0]);
-  fullStatus[19] = highByte(currentStatus.Analog[0]);
-  fullStatus[20] = lowByte(currentStatus.Analog[1]);
-  fullStatus[21] = highByte(currentStatus.Analog[1]);
-  fullStatus[22] = lowByte(currentStatus.Analog[2]);
-  fullStatus[23] = highByte(currentStatus.Analog[2]);
-  fullStatus[24] = lowByte(currentStatus.Analog[3]);
-  fullStatus[25] = highByte(currentStatus.Analog[3]);  
-  fullStatus[26] = lowByte(currentStatus.Analog[4]);
-  fullStatus[27] = highByte(currentStatus.Analog[4]);
-  fullStatus[28] = lowByte(currentStatus.Analog[5]);
-  fullStatus[29] = highByte(currentStatus.Analog[5]);
-  fullStatus[30] = lowByte(currentStatus.Analog[6]);
-  fullStatus[31] = highByte(currentStatus.Analog[6]);
-  fullStatus[32] = lowByte(currentStatus.Analog[7]);
-  fullStatus[33] = highByte(currentStatus.Analog[7]);
-  fullStatus[34] = lowByte(currentStatus.Analog[8]);
-  fullStatus[35] = highByte(currentStatus.Analog[8]);
-  fullStatus[36] = lowByte(currentStatus.Analog[9]);
-  fullStatus[37] = highByte(currentStatus.Analog[9]);
-  fullStatus[38] = lowByte(currentStatus.Analog[10]);
-  fullStatus[39] = highByte(currentStatus.Analog[10]);
-  fullStatus[40] = lowByte(currentStatus.Analog[11]);
-  fullStatus[41] = highByte(currentStatus.Analog[11]);  
-  fullStatus[42] = lowByte(currentStatus.Analog[12]);
-  fullStatus[43] = highByte(currentStatus.Analog[12]);
-  fullStatus[44] = lowByte(currentStatus.Analog[13]);
-  fullStatus[45] = highByte(currentStatus.Analog[13]);
-  fullStatus[46] = lowByte(currentStatus.Analog[14]);
-  fullStatus[47] = highByte(currentStatus.Analog[14]);
-  fullStatus[48] = lowByte(currentStatus.Analog[15]);
-  fullStatus[49] = highByte(currentStatus.Analog[15]);    
-  fullStatus[50] = lowByte(currentStatus.EXin[0]);
-  fullStatus[51] = highByte(currentStatus.EXin[0]);
-  fullStatus[52] = lowByte(currentStatus.EXin[1]);
-  fullStatus[53] = highByte(currentStatus.EXin[1]);
-  fullStatus[54] = lowByte(currentStatus.EXin[2]);
-  fullStatus[55] = highByte(currentStatus.EXin[2]);
-  fullStatus[56] = lowByte(currentStatus.EXin[3]);
-  fullStatus[57] = highByte(currentStatus.EXin[3]);  
-  fullStatus[58] = lowByte(currentStatus.EXin[4]);
-  fullStatus[59] = highByte(currentStatus.EXin[4]);
-  fullStatus[60] = lowByte(currentStatus.EXin[5]);
-  fullStatus[61] = highByte(currentStatus.EXin[5]);
-  fullStatus[62] = lowByte(currentStatus.EXin[6]);
-  fullStatus[63] = highByte(currentStatus.EXin[6]);
-  fullStatus[64] = lowByte(currentStatus.EXin[7]);
-  fullStatus[65] = highByte(currentStatus.EXin[7]);
-  fullStatus[66] = lowByte(currentStatus.EXin[8]);
-  fullStatus[67] = highByte(currentStatus.EXin[8]);
-  fullStatus[68] = lowByte(currentStatus.EXin[9]);
-  fullStatus[69] = highByte(currentStatus.EXin[9]);
-  fullStatus[70] = lowByte(currentStatus.EXin[10]);
-  fullStatus[71] = highByte(currentStatus.EXin[10]);
-  fullStatus[72] = lowByte(currentStatus.EXin[11]);
-  fullStatus[73] = highByte(currentStatus.EXin[11]);  
-  fullStatus[74] = lowByte(currentStatus.EXin[12]);
-  fullStatus[75] = highByte(currentStatus.EXin[12]);
-  fullStatus[76] = lowByte(currentStatus.EXin[13]);
-  fullStatus[77] = highByte(currentStatus.EXin[13]);
-  fullStatus[78] = lowByte(currentStatus.EXin[14]);
-  fullStatus[79] = highByte(currentStatus.EXin[14]);
-  fullStatus[80] = lowByte(currentStatus.EXin[15]);
-  fullStatus[81] = highByte(currentStatus.EXin[15]); 
+  fullStatus[16] = lowByte(currentStatus.digIn_2);
+  fullStatus[17] = highByte(currentStatus.digIn_2);
+  fullStatus[18] = lowByte(currentStatus.digOut);    
+  fullStatus[19] = highByte(currentStatus.digOut);
+  fullStatus[20] = lowByte(currentStatus.digOut_2);    
+  fullStatus[21] = highByte(currentStatus.digOut_2);
+  fullStatus[22] = lowByte(currentStatus.Analog[0]);
+  fullStatus[23] = highByte(currentStatus.Analog[0]);
+  fullStatus[24] = lowByte(currentStatus.Analog[1]);
+  fullStatus[25] = highByte(currentStatus.Analog[1]);
+  fullStatus[26] = lowByte(currentStatus.Analog[2]);
+  fullStatus[27] = highByte(currentStatus.Analog[2]);
+  fullStatus[28] = lowByte(currentStatus.Analog[3]);
+  fullStatus[29] = highByte(currentStatus.Analog[3]);  
+  fullStatus[30] = lowByte(currentStatus.Analog[4]);
+  fullStatus[31] = highByte(currentStatus.Analog[4]);
+  fullStatus[32] = lowByte(currentStatus.Analog[5]);
+  fullStatus[33] = highByte(currentStatus.Analog[5]);
+  fullStatus[34] = lowByte(currentStatus.Analog[6]);
+  fullStatus[35] = highByte(currentStatus.Analog[6]);
+  fullStatus[36] = lowByte(currentStatus.Analog[7]);
+  fullStatus[37] = highByte(currentStatus.Analog[7]);
+  fullStatus[38] = lowByte(currentStatus.Analog[8]);
+  fullStatus[39] = highByte(currentStatus.Analog[8]);
+  fullStatus[40] = lowByte(currentStatus.Analog[9]);
+  fullStatus[41] = highByte(currentStatus.Analog[9]);
+  fullStatus[42] = lowByte(currentStatus.Analog[10]);
+  fullStatus[43] = highByte(currentStatus.Analog[10]);
+  fullStatus[44] = lowByte(currentStatus.Analog[11]);
+  fullStatus[45] = highByte(currentStatus.Analog[11]);  
+  fullStatus[46] = lowByte(currentStatus.Analog[12]);
+  fullStatus[47] = highByte(currentStatus.Analog[12]);
+  fullStatus[48] = lowByte(currentStatus.Analog[13]);
+  fullStatus[49] = highByte(currentStatus.Analog[13]);
+  fullStatus[50] = lowByte(currentStatus.Analog[14]);
+  fullStatus[51] = highByte(currentStatus.Analog[14]);
+  fullStatus[52] = lowByte(currentStatus.Analog[15]);
+  fullStatus[53] = highByte(currentStatus.Analog[15]);    
+  fullStatus[54] = lowByte(currentStatus.EXin[0]);
+  fullStatus[55] = highByte(currentStatus.EXin[0]);
+  fullStatus[56] = lowByte(currentStatus.EXin[1]);
+  fullStatus[57] = highByte(currentStatus.EXin[1]);
+  fullStatus[58] = lowByte(currentStatus.EXin[2]);
+  fullStatus[59] = highByte(currentStatus.EXin[2]);
+  fullStatus[60] = lowByte(currentStatus.EXin[3]);
+  fullStatus[61] = highByte(currentStatus.EXin[3]);  
+  fullStatus[62] = lowByte(currentStatus.EXin[4]);
+  fullStatus[63] = highByte(currentStatus.EXin[4]);
+  fullStatus[64] = lowByte(currentStatus.EXin[5]);
+  fullStatus[65] = highByte(currentStatus.EXin[5]);
+  fullStatus[66] = lowByte(currentStatus.EXin[6]);
+  fullStatus[67] = highByte(currentStatus.EXin[6]);
+  fullStatus[68] = lowByte(currentStatus.EXin[7]);
+  fullStatus[69] = highByte(currentStatus.EXin[7]);
+  fullStatus[70] = lowByte(currentStatus.EXin[8]);
+  fullStatus[71] = highByte(currentStatus.EXin[8]);
+  fullStatus[72] = lowByte(currentStatus.EXin[9]);
+  fullStatus[73] = highByte(currentStatus.EXin[9]);
+  fullStatus[74] = lowByte(currentStatus.EXin[10]);
+  fullStatus[75] = highByte(currentStatus.EXin[10]);
+  fullStatus[76] = lowByte(currentStatus.EXin[11]);
+  fullStatus[77] = highByte(currentStatus.EXin[11]);  
+  fullStatus[78] = lowByte(currentStatus.EXin[12]);
+  fullStatus[79] = highByte(currentStatus.EXin[12]);
+  fullStatus[80] = lowByte(currentStatus.EXin[13]);
+  fullStatus[81] = highByte(currentStatus.EXin[13]);
+  fullStatus[82] = lowByte(currentStatus.EXin[14]);
+  fullStatus[83] = highByte(currentStatus.EXin[14]);
+  fullStatus[84] = lowByte(currentStatus.EXin[15]);
+  fullStatus[85] = highByte(currentStatus.EXin[15]); 
  // fullStatus[82] = lowByte(currentStatus.dev3);
  // fullStatus[83] = highByte(currentStatus.dev3);
  // fullStatus[84] = lowByte(currentStatus.dev4);
@@ -538,12 +542,17 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
 
 void commandButtons(uint16_t cmdCombined)
 {
-
+  
+ // currentStatus.dev1 = cmdCombined;
+  
   switch (cmdCombined)
   {   
     case 256: // cmd is stop    
       BIT_CLEAR(currentStatus.testIO_hardware, 1);    //clear testactive flag
       currentStatus.digOut = 0;                   //reset all outputs to off
+      currentStatus.digOut_2 = 0;                   //reset all outputs to off
+      currentStatus.digIn = 0;                   //reset all inputs to off
+      currentStatus.digIn_2 = 0;                   //reset all inputs to off
       break;
 
     case 257: // cmd is enable
@@ -552,7 +561,7 @@ void commandButtons(uint16_t cmdCombined)
       BIT_SET(currentStatus.testIO_hardware, 1);  //set testactive flag
       break;
           
-    case 513:
+    case 513:  // cmd group is on actions
     case 514:
     case 515:
     case 516:
@@ -568,9 +577,32 @@ void commandButtons(uint16_t cmdCombined)
     case 526:
     case 527:
     case 528: // cmd group is on actions
-      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+          if(BIT_CHECK(currentStatus.testIO_hardware, 1))
         {
           BIT_SET(currentStatus.digOut, (cmdCombined-513));
+        }
+    break;
+    
+    case 529:  // cmd group is on actions
+    case 530:
+    case 531:
+    case 532:
+    case 533:
+    case 534:
+    case 535:
+    case 536:
+    case 537:
+    case 538:
+    case 539:
+    case 540:
+    case 541:
+    case 542:
+    case 543:
+    case 544:
+    /* to do case 529: ... 544: is a GCC extension , the above method is official C method see http://forum.arduino.cc/index.php?topic=247382.0 */
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+        {
+          BIT_SET(currentStatus.digOut_2, (cmdCombined-529));
         }
       break;
       
@@ -594,6 +626,120 @@ void commandButtons(uint16_t cmdCombined)
         {
           BIT_CLEAR(currentStatus.digOut, (cmdCombined-769));
         }
-      break;
+    break;
+    
+    case 785:
+    case 786:
+    case 787:
+    case 788:
+    case 789:
+    case 790:
+    case 791:
+    case 792:
+    case 793:
+    case 794:
+    case 795:
+    case 796:
+    case 797:
+    case 798:
+    case 799:
+    case 800:
+    /*...*/
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+        {
+          BIT_CLEAR(currentStatus.digOut_2, (cmdCombined-785));
+        }
+    break;
+
+    case 1281: // cmd group is on actions
+    case 1282:
+    case 1283:
+    case 1284:
+    case 1285:
+    case 1286:
+    case 1287:
+    case 1288:
+    case 1289:
+    case 1290:
+    case 1291:
+    case 1292:
+    case 1293:
+    case 1294:
+    case 1295:
+    case 1296:
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+        {
+          BIT_SET(currentStatus.digIn, (cmdCombined-1281));
+        }
+    break;
+    
+    case 1297:// cmd group is on actions
+    case 1298:
+    case 1299:
+    case 1300:
+    case 1301:
+    case 1302:
+    case 1303:
+    case 1304:
+    case 1305:
+    case 1306:
+    case 1307:
+    case 1308:
+    case 1309:
+    case 1310:
+    case 1311:
+    case 1312:
+    /*...*/
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+        {
+          BIT_SET(currentStatus.digIn_2, (cmdCombined-1297));
+        }
+    break;
+
+    case 1537: // cmd group is off actions
+    case 1538:
+    case 1539:
+    case 1540:
+    case 1541:
+    case 1542:
+    case 1543:
+    case 1544:
+    case 1545:
+    case 1546:
+    case 1547:
+    case 1548:
+    case 1549:
+    case 1550:
+    case 1551:
+    case 1552:
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+        {
+          BIT_CLEAR(currentStatus.digIn, (cmdCombined-1537));
+        }
+    break;
+    
+    case 1553:// cmd group is off actions
+    case 1554:
+    case 1555:
+    case 1556:
+    case 1557:
+    case 1558:
+    case 1559:
+    case 1560:
+    case 1561:
+    case 1562:
+    case 1563:
+    case 1564:
+    case 1565:
+    case 1566:
+    case 1567:
+    case 1568:
+    /*...*/
+      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+        {
+          BIT_CLEAR(currentStatus.digIn_2, (cmdCombined-1553));
+        }
+    break;
+
   }
 }        
