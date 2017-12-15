@@ -2,6 +2,7 @@ void driveOutputs()
 {
   if(BIT_CHECK(currentStatus.testIO_hardware, 0) == 0)   //if testenable unset then check outputs according to port editor
      {
+    //  currentStatus.dev1 = 11;
       for (byte DoutCH = 1; DoutCH < 17 ; DoutCH++)     //loop through outputs 1 to 32
          {      
           portX = DoutCH-1;
@@ -229,8 +230,9 @@ void driveOutputs()
          }     // ends the for next 1-17 count loop
      }  //ends the else (not a test)
   
-  else      //if(BIT_CHECK(currentStatus.testIO_hardware, 0) == 1) so this is a test , do direct port ops according to the bitread  
-     {   
+  else if(BIT_CHECK(currentStatus.testIO_hardware, 0) == 1)       // so this is a test , do direct port ops according to the bitread  
+     {
+     // currentStatus.dev1 = 101;   
       for (byte ToutCH = 1; ToutCH < 17 ; ToutCH++)     //loop through outputs 1 to 17
          {
           portX = ToutCH-1;

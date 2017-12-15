@@ -205,10 +205,10 @@ void loop()
        
       if (BIT_sCHECK(configPage1.canModuleConfig, CAN1ENABLE) == 1)
          {  
-          currentStatus.dev1 = 100;
+         // currentStatus.dev1 = 100;
           if(!digitalRead(CAN1_INT))                         // If CAN1_INT pin is low, read receive buffer
             {
-              currentStatus.dev1 = 20;
+         //     currentStatus.dev1 = 20;
              CAN1_INT_routine();
             }
          }

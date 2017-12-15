@@ -1,25 +1,27 @@
 void CAN0_INT_routine()
-{
-  #if OBD_ACTIVE == 1
-        #if OBD_CANPORT == 0
+{ 
+  #if OBD_CANPORT == 0
+        #if OBD_ACTIVE == 1
             //obd_command(0);
+        #else
+            receive_CAN0_message();
         #endif
   #else
-    receive_CAN0_message()
-  #endif
+    receive_CAN0_message();     
+  #endif    
 }
 
 void CAN1_INT_routine()
 {
-  #if OBD_ACTIVE == 1
-        #if OBD_CANPORT == 1    //use can1 for obd data stream
+   #if OBD_CANPORT == 1    //use can1 for obd data stream
+        #if OBD_ACTIVE == 1
            //if ((rxId == 0x7DF) || (rxId == (configPage3.gpio_obd_address+0x100)))
            //   {
                 obd_command(1);
            //   }  
         #endif
   #else
-    receive_CAN1_message()      
+    receive_CAN1_message();      
   #endif
 }
 
@@ -130,17 +132,22 @@ void receive_CAN0_message()
              { 
               if(BIT_sCHECK(configPage4.remoteoutput_sel_0_16, Ochan) == 1)   //is the individual remoteout enabled
                 {
-                 if(configPage4.remoteoutput_can_address[Ochan] == rxId)       // is the can address received same as a remoteoutput one
+          currentStatus.dev1 = 104;
+          currentStatus.dev2 = rxId;// ((configPage4.remoteoutput_can_address[Ochan]&2047)+0x100);
+                 if(((configPage4.remoteoutput_can_address[Ochan]&2047)+0x100) == rxId)       // is the can address received same as a remoteoutput one
                    {
+          currentStatus.dev1 = 100;
                     if(rxBuf[0] != 4)   //if the value is 4 then ignore the message as it is a status message sent by a gpio
                       {
+          currentStatus.dev1 = 109;
                       //do the change. 
                       byte newstate;
                       newstate = (currentStatus.remote_output_status[Ochan] & 252 )| (rxBuf[0] & 3);       
                       //&252 masks the top 6bits ,clearing bits 0 and 1 , the &3 masks to leave bits 1 and 0 only 
                       //this will change state to on or off withouth affecting the error flags
                       currentStatus.remote_output_status[Ochan] = newstate;
-                      if (BIT_sCHECK(rxBuf[0],REMOTE_OUT_ON == 1))
+          currentStatus.dev2 = newstate;
+                      if (BIT_sCHECK(rxBuf[0],REMOTE_OUT_OFF == 1))
                         {
                          BIT_SET(currentStatus.digOut, (Ochan) );                                        
                         }
@@ -162,7 +169,7 @@ void receive_CAN0_message()
              { 
               if(BIT_sCHECK(configPage4.remoteoutput_sel_17_31, Ochan) == 1)   //is the individual remoteout enabled
                 {
-                 if(configPage4.remoteoutput_can_address[(Ochan+16)] == rxId)       // is the can address received same as a remoteoutput one
+                 if(((configPage4.remoteoutput_can_address[(Ochan+16)]&2047)+0x100) == rxId)       // is the can address received same as a remoteoutput one
                    {
                     if(rxBuf[0] != 4)   //if the value is 4 then ignore the message as it is a status message sent by a gpio
                       {
@@ -172,11 +179,11 @@ void receive_CAN0_message()
                        //&252 masks the top 6bits ,clearing bits 0 and 1 , the &3 masks to leave bits 1 and 0 only 
                        //this will change state to on or off withouth affecting the error flags
                        currentStatus.remote_output_status[(Ochan+16)] = newstate;
-                       if (BIT_sCHECK(rxBuf[0],REMOTE_OUT_ON == 1))
+                       if (BIT_sCHECK(rxBuf[0],REMOTE_OUT_OFF == 1))
                          {
                           BIT_SET(currentStatus.digOut_2, (Ochan) );                                        
                          }
-                 else if (BIT_sCHECK(rxBuf[0],REMOTE_OUT_OFF == 1))
+                 else if (BIT_sCHECK(rxBuf[0],REMOTE_OUT_OFF == 0))
                          {
                           BIT_CLEAR(currentStatus.digOut_2, (Ochan) );    
                          }
@@ -242,13 +249,16 @@ void canbroadcastperfreq(byte freqcheck)
                  {
                   if ((((configPage4.remoteinput_port[RIchan]&63)-1))<= 16)
                      {
-                      cpActive = BIT_sCHECK(configPage1.DinchanActive, ((configPage4.remoteinput_port[RIchan]&63)-1));      // if chanX input pin port is valid(ie enabled in utils)  &63 is a 6bit mask               
+                      cpActive = BIT_sCHECK(configPage1.DinchanActive, ((configPage4.remoteinput_port[RIchan]&63)-1));  
+                      // if chanX input pin port is valid(ie enabled in utils)  &63 is a 6bit mask               
                       senddata[0] = (BIT_sCHECK(currentStatus.digIn, ((configPage4.remoteinput_port[RIchan]&63)-1)));   //set the first byte to the value of the input state                          
+                      senddata[1] = 0;
                      }
                   else if ((((configPage4.remoteinput_port[RIchan]&63)-1)) >= 17)
                      {   
                       cpActive = BIT_sCHECK(configPage1.DinchanActive_2, ((configPage4.remoteinput_port[RIchan]&63)-17));
                       senddata[0] = (BIT_sCHECK(currentStatus.digIn_2, ((configPage4.remoteinput_port[RIchan]&63)-17)));   //set the first byte to the value of the input state
+                      senddata[1] = 0;                      
                      }  
                  
                   if (cpActive == 1)
@@ -274,11 +284,13 @@ void canbroadcastperfreq(byte freqcheck)
                      {
                       cpActive = BIT_sCHECK(configPage1.DinchanActive, ((configPage4.remoteinput_port[RIchan]&63)-1));      // if chanX input pin port is valid(ie enabled in utils)              
                       senddata[0] = (BIT_sCHECK(currentStatus.digIn, ((configPage4.remoteinput_port[RIchan]&63)-1)));   //set the first byte to the value of the input state                          
+                      senddata[1] = 0;                      
                      }
                   else if ((((configPage4.remoteinput_port[RIchan]&63)-1)) >= 17)
                      {   
                       cpActive =BIT_sCHECK(configPage1.DinchanActive_2, ((configPage4.remoteinput_port[RIchan]&63)-17));
                       senddata[0] = (BIT_sCHECK(currentStatus.digIn_2, ((configPage4.remoteinput_port[RIchan]&63)-17)));   //set the first byte to the value of the input state
+                      senddata[1] = 0;                      
                      }  
                  
                   if (cpActive ==1)
