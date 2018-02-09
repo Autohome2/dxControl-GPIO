@@ -27,14 +27,14 @@ Current layout of EEPROM data (Version 3) is as follows (All sizes are in bytes)
 |---------------------------------------------------|
 | 0     |1    | Data structure version              |
 | 10    |128  | configPage1
-| 200   |256  | configpage2
+| 200   |353  | configpage2
 
 */
 
 #define EEPROM_CONFIG1_START 10
 #define EEPROM_CONFIG1_END 138     // 128 slots
 #define EEPROM_CONFIG2_START 200
-#define EEPROM_CONFIG2_END 456     //256 slots
+#define EEPROM_CONFIG2_END 553    //456     //353 256 slots
 
 byte EEPROM_loc;
 

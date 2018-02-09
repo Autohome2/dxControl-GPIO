@@ -21,6 +21,7 @@ A full copy of the license may be found in the speeduino projects root directory
 #include "timers.h"
 #include "remotecomms.h"
 #include "display.h"
+ 
 #include <EEPROM.h>
 
 #include <SPI.h>
@@ -52,14 +53,14 @@ A full copy of the license may be found in the speeduino projects root directory
   #if defined (USE_EXT_EEPROM)
     //#include <SPI.h>
     #include "stm32_ext_eeprom.h"
-    SPIClass SPI_2(2); //Create an instance of the SPI Class called SPI_2 that uses the 2nd SPI Port   
+//    SPIClass SPI_2(2); //Create an instance of the SPI Class called SPI_2 that uses the 2nd SPI Port   
   #endif
   
 // setup which serial port connects to the speeduino secondary serial
 #if defined(ARDUINO_AVR_MEGA2560)
     // mega pin assignments
     HardwareSerial &SERIALLink = Serial3;
-#elif defined(MCU_STM32F103C8)
+#elif defined(CORE_STM32)//(MCU_STM32F103C8)
     #define SERIALLink Serial2
 #elif defined(ARDUINO_NUCLEO_64)//(CORE_STM32)
     #define SERIALLink Serial1   
@@ -71,7 +72,7 @@ A full copy of the license may be found in the speeduino projects root directory
 #if defined(ARDUINO_AVR_MEGA2560)
     HardwareSerial &CONSOLE_SERIALLink = Serial;
 
-#elif defined (CORE_STM32)&&(MCU_STM32F103C8)
+#elif defined (CORE_STM32)    //&&(MCU_STM32F103C8)
     #define CONSOLE_SERIALLink Serial1 
 #endif
 

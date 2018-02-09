@@ -24,8 +24,8 @@ void writeConfig(uint8_t thePage)
  // int offset;
   //Create a pointer to the config page
   
-  void* pnt_configPage;//This only stores the address of the value that it's pointing to and not the max size
-  void* pnt_stm32_configPage;//This only stores the address of the value that it's pointing to and not the max size
+  byte* pnt_configPage;//This only stores the address of the value that it's pointing to and not the max size
+  byte* pnt_stm32_configPage;//This only stores the address of the value that it's pointing to and not the max size
 
 #if defined (CORE_AVR)  
   if(EEPROM.read(0) != data_structure_version) { EEPROM.write(0,data_structure_version); }   //Write the data structure version
@@ -80,7 +80,8 @@ void writeConfig(uint8_t thePage)
   for(uint16_t x=EEPROM_CONFIG2_START; x<EEPROM_CONFIG2_END; x++) 
   { 
 #if defined (CORE_AVR)
-    if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))); }
+    //if(EEPROM.read(x) != *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *((uint8_t *)pnt_configPage + (uint16_t)(x - EEPROM_CONFIG2_START))); }
+    if(EEPROM.read(x) != *(pnt_configPage + byte(x - EEPROM_CONFIG2_START))) { EEPROM.write(x, *(pnt_configPage + byte(x - EEPROM_CONFIG2_START)));}
 #elif defined (CORE_STM32)//(MCU_STM32F103C8)
         if(NVMEMread(x) != *((uint8_t *)pnt_stm32_configPage + (uint8_t)(x - EEPROM_CONFIG2_START)))
           {     
@@ -151,6 +152,10 @@ uint8_t NVMEMread(uint16_t address)
       theValue = fram.read8(address);
   #endif
 
+  #if defined (USE_INT_EEPROM)
+      theValue = EEPROM.read(address);
+  #endif
+
   #if defined (USE_EXT_EEPROM)
       byte tmp;
       theValue = _read_byte_address(address);
@@ -183,6 +188,11 @@ void NVMEMwrite(uint16_t address, uint8_t data_Byte, bool erase_flash)
     fram.write8(address, data_Byte);
     fram.writeEnable(false);
   #endif
+
+  #if defined (USE_INT_EEPROM)
+      EEPROM.write(address,data_Byte);
+  #endif
+
   
   #if defined (USE_EXT_EEPROM)
    currentStatus.dev1 = address;

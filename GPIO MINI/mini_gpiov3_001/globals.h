@@ -11,21 +11,22 @@
 #elif defined(CORE_TEENSY)
   #define BOARD_NR_GPIO_PINS 34
   
-#elif defined(STM32_MCU_SERIES) || defined(_VARIANT_ARDUINO_STM32_)
+#elif defined(STM32_MCU_SERIES) || defined(_VARIANT_ARDUINO_STM32_) || (defined (ARDUINO_ARCH_STM32))     //the arch_stm32 comes from the stm32generic core addition
       #define CORE_STM32
-      #define LED_BUILTIN PC13
+//      #define LED_BUILTIN PC13
       //only choose one of the following two defines , comment out the unused ones
+      #define USE_INT_EEPROM
    // #define USE_EXT_FLASH
-      #define USE_EXT_EEPROM
+//      #define USE_EXT_EEPROM
   //  #define USE_EXT_FRAM
   
       #define EXT_FLASH_SIZE 8192
       #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
 
       extern "C" char* sbrk(int incr); //Used to freeRam
-      inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
-      #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
-      #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+ //     inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
+ //     #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+ //     #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
 #else
   #error Incorrect board selected. Please select the correct board (Usually Mega 2560) and upload again
 #endif  
@@ -41,6 +42,9 @@
   #define NUCLEO_64_STM32
 
 #elif defined(MCU_STM32F103C8)
+  #define F108C8_STM32
+
+#elif defined(ARDUINO_BLUEPILL_F103C8)
   #define F108C8_STM32
 
 #elif defined(MCU_STM32F407VGT6)
@@ -96,7 +100,7 @@ const unsigned char simple_remote_RevNum[] = "speeduino 201706-mini GPIO V0.003"
 uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
 const uint8_t page_1_size = 128;
-const uint16_t page_2_size = 256;
+const uint16_t page_2_size = 353;//256;
 volatile uint8_t swap_page = 0; // current external flash swap page number
 volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when all written
 
@@ -226,63 +230,63 @@ byte unused127 = 227;
 
 struct config2 {
   uint8_t    port_Enabled[16];                // 1 if enabled 0 if not
-  uint8_t    port_Condition[16];              // < is 60, = is 61, > is 62, & is 38
+  uint8_t    port_Condition[32];              // < is 60, = is 61, > is 62, & is 38
   uint8_t    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
   uint8_t    port_InitValue[16];              // 1 on 0 off
   uint8_t    port_PortValue[16];              // 1 if active high 0 if active low
-  uint8_t    port_OutSize[16];                // unsure of purpose but must be present
-  uint16_t   port_OutOffset[16];              // port offset refers to the offset value from the output channels
-  uint16_t    port_Threshold[16];              // threshhold value for on/off
-  uint16_t    port_Hysteresis[16];             // hysteresis value for on/off
-  uint8_t    port_CanId[16];                  // TScanid of the device the output channel is from  
-byte unused2_208;
-byte unused2_209;
-byte unused2_210;
-byte unused2_211;
-byte unused2_212;
-byte unused2_213;
-byte unused2_214;
-byte unused2_215;
-byte unused2_216;
-byte unused2_217;
-byte unused2_218;
-byte unused2_219;
-byte unused2_220;
-byte unused2_221;
-byte unused2_222;
-byte unused2_223;
-byte unused2_224;
-byte unused2_225;
-byte unused2_226;
-byte unused2_227;
-byte unused2_228;
-byte unused2_229;
-byte unused2_230;
-byte unused2_231;
-byte unused2_232;
-byte unused2_233;
-byte unused2_234;
-byte unused2_235;
-byte unused2_236;
-byte unused2_237;
-byte unused2_238;
-byte unused2_239;
-byte unused2_240;
-byte unused2_241;
-byte unused2_242;
-byte unused2_243;
-byte unused2_244;
-byte unused2_245;
-byte unused2_246;
-byte unused2_247;
-byte unused2_248;
-byte unused2_249;
-byte unused2_250;
-byte unused2_251;
-byte unused2_252;
-byte unused2_253; 
-byte unused2_254;
-byte unused2_255; 
+  uint8_t    port_OutSize[32];                // unsure of purpose but must be present
+  uint16_t   port_OutOffset[32];              // port offset refers to the offset value from the output channels
+  uint16_t    port_Threshold[32];              // threshhold value for on/off
+  uint16_t    port_Hysteresis[32];             // hysteresis value for on/off
+  uint8_t    port_CanId[32];                  // TScanid of the device the output channel is from  
+//byte unused2_208;
+//byte unused2_209;
+//byte unused2_210;
+//byte unused2_211;
+//byte unused2_212;
+//byte unused2_213;
+//byte unused2_214;
+//byte unused2_215;
+//byte unused2_216;
+//byte unused2_217;
+//byte unused2_218;
+//byte unused2_219;
+//byte unused2_220;
+//byte unused2_221;
+//byte unused2_222;
+//byte unused2_223;
+//byte unused2_224;
+//byte unused2_225;
+//byte unused2_226;
+//byte unused2_227;
+//byte unused2_228;
+//byte unused2_229;
+//byte unused2_230;
+//byte unused2_231;
+//byte unused2_232;
+//byte unused2_233;
+//byte unused2_234;
+//byte unused2_235;
+//byte unused2_236;
+//byte unused2_237;
+//byte unused2_238;
+//byte unused2_239;
+//byte unused2_240;
+//byte unused2_241;
+//byte unused2_242;
+//byte unused2_243;
+//byte unused2_244;
+//byte unused2_245;
+//byte unused2_246;
+//byte unused2_247;
+//byte unused2_248;
+//byte unused2_249;
+//byte unused2_250;
+//byte unused2_251;
+//byte unused2_252;
+//byte unused2_253; 
+//byte unused2_254;
+//byte unused2_255; 
 #if defined(CORE_AVR)
   };
 #else

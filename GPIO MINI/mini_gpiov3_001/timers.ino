@@ -54,7 +54,7 @@ void initialiseTimers()
 //Executes every ~1ms.
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) //AVR chips use the ISR for this
 ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
-#elif defined (CORE_TEENSY) || defined(MCU_STM32F103C8)
+#elif defined (CORE_TEENSY) || defined(CORE_STM32)  //(MCU_STM32F103C8)
 void oneMSInterval() //Most ARM chips can simply call a function
 #endif
 {

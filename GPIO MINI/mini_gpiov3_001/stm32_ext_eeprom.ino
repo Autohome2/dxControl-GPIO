@@ -17,12 +17,12 @@ void init_stm32_ext_eeprom(uint8_t spiport)
   else if (spiport == 2)
   {
     // Setup ext_eeprom to use SPI 2
-  SPI_2.begin(); //Initialize the SPI_2 port.
-  SPI_2.setBitOrder(MSBFIRST); // Set the SPI_2 bit order
-  SPI_2.setDataMode(SPI_MODE0); //Set the  SPI_2 data mode 
-  SPI_2.setClockDivider(SPI_CLOCK_DIV8);  // Use a different speed to SPI 1
-  pinMode(SPI2_NSS_PIN, OUTPUT);
-  slaveselectPin = SPI2_NSS_PIN;
+//  SPI_2.begin(); //Initialize the SPI_2 port.
+//  SPI_2.setBitOrder(MSBFIRST); // Set the SPI_2 bit order
+//  SPI_2.setDataMode(SPI_MODE0); //Set the  SPI_2 data mode 
+//  SPI_2.setClockDivider(SPI_CLOCK_DIV8);  // Use a different speed to SPI 1
+//  pinMode(SPI2_NSS_PIN, OUTPUT);
+//  slaveselectPin = SPI2_NSS_PIN;
   }
 }
 /*

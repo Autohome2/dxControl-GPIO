@@ -135,12 +135,12 @@ void outputaction(uint8_t chanX)
               //activate the output according to setup/config
               if (configPage2.port_PortValue[chanX] == 1 ) // if the output is active high
                   {
-                   currentStatus.OutputPort[chanX] = B00000011;  // output1 is [0]
+                   currentStatus.OutputPort[chanX] = 0b00000011;  // output1 is [0]
                    BIT_SET(currentStatus.digOut, (chanX) );
                   }  
               else if (configPage2.port_PortValue[chanX] == 0 )  // if the output is active low
                   {
-                    currentStatus.OutputPort[chanX] = B00000001;
+                    currentStatus.OutputPort[chanX] = 0b00000001;
                     BIT_CLEAR(currentStatus.digOut, (chanX) );
                   }  
               }
@@ -151,12 +151,12 @@ void outputaction(uint8_t chanX)
                   //deactivate the output according to setup/config
                   if (configPage2.port_PortValue[chanX] == 1 ) // if the output is active high
                       {
-                       currentStatus.OutputPort[chanX] = B00000010;             
+                       currentStatus.OutputPort[chanX] = 0b00000010;             
                        BIT_CLEAR(currentStatus.digOut, (chanX) );
                       }    
                   else if (configPage2.port_PortValue[chanX] == 0 ) 
                       {
-                       currentStatus.OutputPort[chanX] = B00000000;
+                       currentStatus.OutputPort[chanX] = 0b00000000;
                        BIT_SET(currentStatus.digOut, (chanX) );
                       }   
                   }   
