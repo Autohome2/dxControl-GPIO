@@ -51,56 +51,20 @@
   #define F407_STM32  
 
 #endif
-
-/*
- The "A" command allows you to specify where in the reltime data list you want the Speeduino to start sending you data from , and how many bytes you want to be sent.
- The format is "A" where
- A == the main command
-
- Speeduino replies with 
- "A" == confirming the command sent
- reply length == a single byte with a value of the number of bytes it will be sending
- xx bytes == the number of data bytes according to the replylength.
-*/
  
-/*
- The "r" command allows you to specify where in the reltime data list you want the Speeduino to start sending you data from , and how many bytes you want to be sent.
- The format is "r\$tsCanId\x30%2o%2c" where
- r == the main command
- tsCanId == the canid of the device being called
- x30 == dec48 the optimised output command
- 2o == 2 bytes of offset
- 2c == 2 bytes of length
-
- Speeduino replies with 
- "r" == confirming the command sent
- reply length == a single byte with a value of the number of bytes it will be sending
- xx bytes == the number of data bytes according to the replylength.
-  
- */
 #define maincommand  'r'    // the command to send to the Speeduino
 #define commandletterr  'r'
-uint8_t tsCanId = 0;          // this is the tunerstudio canID for the device you are requesting data from , this is 0 for the main ecu in the system which is usually the speeduino ecu . 
-                              // this value is set in Tunerstudio when configuring your Speeduino
-//uint16_t realtime_offset = 4;  // the offset of the realtime data to start reading from
-//uint16_t realtime_bytes = 1;   // the number of bytes requested
+uint8_t tsCanId = 0;          // this is the tunerstudio canID for the device you are requesting data from , this is 0 for the main ecu in the system which is usually the speeduino ecu .                               
 
-/*
-change the realtime_offset to what offset position you wish to read the realtime data from
-eg : realtime_offset = 4 , this relates to the currentStatus.MAP
-This is 1 byte long so if this is the only byte you want to read set realtime_bytes to 1
-
-eg : realtime_offset = 8 , this relates to the  currentStatus.battery10 (battery voltage)
-this is 1 byte long.
-if you set realtime_bytes = 2
-then you will also be sent offset 9 too which is currentStatus.O2
- */
-const unsigned char simple_remote_signature[]    = "speeduino_mini_GPIOV0.003 201706"; //this must match the ini
-const unsigned char simple_remote_RevNum[] = "speeduino 201706-mini GPIO V0.003";      //this is what is displayed in the TS header bar
+const unsigned char simple_remote_signature[]    = "speeduino_mini_GPIOV3.001 201802"; //this must match the ini
+const unsigned char simple_remote_RevNum[] = "speeduino 201802-mini GPIO V3.001";      //this is what is displayed in the TS header bar
 uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
+
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
 const uint8_t page_1_size = 128;
-const uint16_t page_2_size = 353;//256;
+const uint16_t page_2_size = 353;
+const uint16_t page_3_size = 16;
+
 volatile uint8_t swap_page = 0; // current external flash swap page number
 volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when all written
 
@@ -121,6 +85,15 @@ uint16_t theoffset, thelength;  //used with serial data
 #define BIT_TIMER_30HZ            5
 #define celBlink_time             4   //4 seconds
 
+//testIO_hardware bit fields
+#define BIT_STATUS_TESTIO_OUTTESTENABLED       0
+#define BIT_STATUS_TESTIO_OUTTESTACTIVE        1
+#define BIT_STATUS_TESTIO_AINTESTENABLED       2
+#define BIT_STATUS_TESTIO_AINTESTACTIVE        3
+#define BIT_STATUS_TESTIO_UNUSED5              4
+#define BIT_STATUS_TESTIO_UNUSED6              5
+#define BIT_STATUS_TESTIO_UNUSED7              6
+
 volatile byte TIMER_mask;
 volatile byte LOOP_TIMER;
 
@@ -132,7 +105,8 @@ struct statuses {
   volatile unsigned int loopsPerSecond ;
   volatile  uint16_t freeRAM ;
   volatile uint8_t currentPage;
-  volatile uint8_t testIO_hardware;//testIO_hardware
+  volatile uint8_t testIO_hardware;   //testIO_hardware see bit field for bit allocation
+  volatile uint16_t aintestsent;      //bitfield holding flag to show if forced value was sent
   uint16_t currentInputvalue[2];      //holds the analog input value for each conditional input , [0] first condition and [1] holds the second
   uint16_t currentInputvalueCond[3];  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
   uint8_t condition_pass[16];          // array stores pass/fail flags for the one or two(if selected) condition checks
@@ -159,14 +133,14 @@ struct statuses {
 //this is laid out as first the byte size data then the words
 
 struct config1 {
-uint16_t master_controller_address:11 ;
-uint8_t pinLayout;
-uint8_t speeduinoConnection;//:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
+uint16_t master_controller_address;//:11 ;
+uint8_t  pinLayout;
+uint8_t  speeduinoConnection;//:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
 uint16_t speeduinoBaseCan ;//:11;       //speeduino base can address
-uint8_t unused6;
-uint8_t unused7;
-uint8_t unused8;
-uint8_t unused9;
+uint8_t  unused1_6;
+uint8_t  unused1_7;
+uint8_t  unused1_8;
+uint8_t  unused1_9;
 uint16_t DoutchanActive;          // digital outputchannels 1-16 active flags
 uint16_t DoutchanActive_2;        // digital output channels 17-32 active flags
 uint16_t DinchanActive;           // digital input channels 1-16 active flags
@@ -175,17 +149,17 @@ uint16_t AinchanActive;           // analog input channels 1-16 active flags
 uint16_t AinchanActive_2;         // analog  input channels 17-32 active flags
 uint16_t exinsel;                 // External input channel enabled bit flags
 uint16_t INdata_from_Can[16];     // can address of source of data 0x100(256dec) to 0x7FF(2047dec) as 0 dec - 535 dec
-uint8_t data_from_offset[16];        // offset of data source 0 - 255
-uint8_t num_bytes[16];               // number of bytes length of data source 0,1,or 2
-byte unused88;
-byte unused89;
-byte unused90;
-byte unused91;
-byte unused92;
-byte unused93;
-byte unused94;
-byte unused95;
-byte unused96;
+uint8_t  data_from_offset[16];    // offset of data source 0 - 255
+uint8_t  num_bytes[16];           // number of bytes length of data source 0,1,or 2
+byte     unused1_88;
+byte     unused1_89;
+byte     unused1_90;
+byte     unused1_91;
+byte     unused1_92;
+byte     unused1_93;
+byte     unused1_94;
+byte     unused1_95;
+byte     unused1_96;
 byte unused97;
 byte unused98;
 byte unused99;
@@ -223,8 +197,6 @@ byte unused127 = 227;
   } __attribute__((__packed__)); //The 32 bi systems require all structs to be fully packed
 #endif
 
-//};
-
 //Page 2 of the config - See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
@@ -236,8 +208,8 @@ struct config2 {
   uint8_t    port_PortValue[16];              // 1 if active high 0 if active low
   uint8_t    port_OutSize[32];                // unsure of purpose but must be present
   uint16_t   port_OutOffset[32];              // port offset refers to the offset value from the output channels
-  uint16_t    port_Threshold[32];              // threshhold value for on/off
-  uint16_t    port_Hysteresis[32];             // hysteresis value for on/off
+  uint16_t   port_Threshold[32];              // threshhold value for on/off
+  uint16_t   port_Hysteresis[32];             // hysteresis value for on/off
   uint8_t    port_CanId[32];                  // TScanid of the device the output channel is from  
 //byte unused2_208;
 //byte unused2_209;
@@ -292,7 +264,18 @@ struct config2 {
 #else
   } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
 #endif
-//};
+
+//Page 3 of the config - See the ini file for further reference
+//this is laid out as first the byte size data then the words
+
+struct config3 {
+  uint8_t    aintestData[16];                // 
+
+#if defined(CORE_AVR)
+  };
+#else
+  } __attribute__((__packed__)); //The 32 bi systems require all structs to be fully packed
+#endif
 
  //declare io pins
 byte pinOut[17]; //digital outputs array is +1 as pins start at 1 not 0
@@ -306,8 +289,6 @@ byte pinAin[17]; //analog inputs
 extern struct statuses currentStatus; // from passthrough.ino
 extern struct config1 configPage1;  
 extern struct config2 configPage2;
-
-//extern unsigned long currentLoopTime; //The time the current loop started (uS)
-//extern unsigned long previousLoopTime; //The time the previous loop started (uS)
+extern struct config3 configPage3;
 
 #endif // GLOBALS_H                              

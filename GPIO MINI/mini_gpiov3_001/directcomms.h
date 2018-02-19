@@ -5,6 +5,7 @@
 
 #define simple_remote_setupPage    1 //Config Page 1
 #define port_editor_config         2 // port editor config page
+#define no_saved_dataPage          3 // no saved data page
 
 //uint8_t realtimebuffer[60];   //buffer array to store the realtime data read
 //volatile uint8_t replylength;          // the length of the reply variable
@@ -18,6 +19,6 @@ void dodirect_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset
 void direct_receiveValue(uint16_t rvOffset, uint8_t newValue);
 void direct_sendPage(uint16_t send_page_offset,uint16_t send_page_Length, byte can_id, byte cmd);
 void direct_sendValues(uint16_t offset, uint16_t packetLength, byte cmd);
-void commandButtons(uint16_t cmdCombined);
+void commandButtons(uint16_t cmdCombined, uint16_t cmdData);
 
 #endif // DIRECTCOMMS_H

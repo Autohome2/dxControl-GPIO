@@ -22,7 +22,7 @@ void direct_serial_command()
     switch (CONSOLE_SERIALLink.read())
           {
           case 'A':
-                  direct_sendValues(0, direct_packetSize, 60);//(offset,packet size lenght,cmd)
+                  direct_sendValues(0, direct_packetSize, 60);       //format is (offset,packet size length,cmd)
           break; 
            
           case 'B': // Burn current values to eeprom
@@ -39,12 +39,16 @@ void direct_serial_command()
           case 'E': // receive command button commands
                   byte tmp;
                   uint16_t theoffset;
+                  uint16_t thedata;
                   while (CONSOLE_SERIALLink.available() == 0) {}
                   tmp = CONSOLE_SERIALLink.read();
                   while (CONSOLE_SERIALLink.available() == 0) {}
-                  theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
-                 // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
-                  commandButtons(theoffset);
+                  theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;                 
+                  //while (CONSOLE_SERIALLink.available() == 0) {}
+                  //tmp = CONSOLE_SERIALLink.read();
+                  //while (CONSOLE_SERIALLink.available() == 0) {}
+                  //thedata = (CONSOLE_SERIALLink.read()<<8) | tmp;                 
+                  commandButtons(theoffset, thedata);
           break;
           
           case 'F': // send serial protocol version
@@ -61,64 +65,61 @@ void direct_serial_command()
           break;
       
           case 'Q': // send code version
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                        {
-                        CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
-                        }
+                  for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
+                     {
+                      CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
+                     }
           break;
           
           case 'S': // send code version
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
-                        {
-                        CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
-                        currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
-                        }
+                  for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                     {
+                      CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
+                      currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
+                     }
           break;
 
           case 'V': // send VE table and constants in binary
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
-               // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                thelength = (CONSOLE_SERIALLink.read()<<8) | tmp;
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  tmp = CONSOLE_SERIALLink.read();
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;               
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  tmp = CONSOLE_SERIALLink.read();
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  thelength = (CONSOLE_SERIALLink.read()<<8) | tmp;
  
-                direct_sendPage(theoffset,thelength,thistsCanId,0);
-                //  direct_sendPage(0,thistsCanId,0);
+                  direct_sendPage(theoffset,thelength,thistsCanId,0);
+                  //  direct_sendPage(0,thistsCanId,0);
           break;
 
           case 'W': // receive new VE obr constant at 'W'+<offset>+<newbyte>
-                //A 2nd byte of data is required after the 'P' specifying the new page number.
-                if (CONSOLE_SERIALLink.available() >= 4)
-      {
-                //while (CONSOLE_SERIALLink.available() == 0) {}
-                currentStatus.currentPage = CONSOLE_SERIALLink.read();
-                //while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
-                //while (CONSOLE_SERIALLink.available() == 0) {}
-                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
-                //theoffset = word(CONSOLE_SERIALLink.read(), tmp);
-                //while (CONSOLE_SERIALLink.available() == 0) {}
-                direct_receiveValue(theoffset, CONSOLE_SERIALLink.read());
-      }
+                  //A 2nd byte of data is required after the 'P' specifying the new page number.
+                  if (CONSOLE_SERIALLink.available() >= 4)
+                    {
+                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                     currentStatus.currentPage = CONSOLE_SERIALLink.read();
+                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                     tmp = CONSOLE_SERIALLink.read();
+                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                     theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;                     
+                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                     direct_receiveValue(theoffset, CONSOLE_SERIALLink.read());
+                    }
           break;
      
           case 'r': 
-                byte cmd;
-                byte tsCanId_sent;         
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                tsCanId_sent = CONSOLE_SERIALLink.read(); //Read the $tsCanId
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                cmd = CONSOLE_SERIALLink.read();
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
-               // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
-                while (CONSOLE_SERIALLink.available() == 0) {}
+                  byte cmd;
+                  byte tsCanId_sent;         
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  tsCanId_sent = CONSOLE_SERIALLink.read(); //Read the $tsCanId
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  cmd = CONSOLE_SERIALLink.read();
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  tmp = CONSOLE_SERIALLink.read();
+                  while (CONSOLE_SERIALLink.available() == 0) {}
+                  theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;                  
+                  while (CONSOLE_SERIALLink.available() == 0) {}
                 tmp = CONSOLE_SERIALLink.read();
                 
                 if (cmd != 87)          //if is "W" only 1 more byte is sent
@@ -214,29 +215,29 @@ void direct_serial_command()
 return;
  
 }
+
 void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset, uint16_t thelength)
-{
-  
+{  
     switch (commandletter)
-           {
+          {
            case 15:    //
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                        {
-                        CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
-                        }  
+                   for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
+                      {
+                       CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
+                      }  
            break;
                         
            case 14:  //
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
-                        {
-                        CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
-                        currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
-                        }     
+                   for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                      {
+                       CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
+                       currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
+                      }     
            break;
                         
-           case 48:    //previously 0x30:
-                                // CONSOLE_SERIALLink.print("got to 3d");
-                                 // direct_sendValues(offset, length, cmd);
+           case 48:    //previously 0x30
+                       // CONSOLE_SERIALLink.print("got to 3d");
+                       // direct_sendValues(offset, length, cmd);
            break;
                         
            case 60:  //(0x3c+120 == 0xB4(112dec)):       
@@ -245,30 +246,29 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
 
            case 66: // r version of B == 0x42
                     // Burn current values to eeprom
-                    currentStatus.currentPage = byte(theoffset);
-                    writeConfig(currentStatus.currentPage);
+                   currentStatus.currentPage = byte(theoffset);
+                   writeConfig(currentStatus.currentPage);
            break;
            
            case 69: // r version of E == 0x45
-                  commandButtons(theoffset);
+                   commandButtons(theoffset, thelength);
            break;
                                
            case 80:  //r version of P == dec80
-                  currentStatus.currentPage = byte(theoffset);
+                   currentStatus.currentPage = byte(theoffset);
            break;
           
            case 86:  //r version of V == dec86
-                  //direct_sendPage(thelength,thistsCanId,86);
-                  direct_sendPage(theoffset,thelength,thistsCanId,86);
+                   //direct_sendPage(thelength,thistsCanId,86);
+                   direct_sendPage(theoffset,thelength,thistsCanId,86);
            break;
                     
            case 87:  //r version of W(0x57)
-                 // int valueOffset; //cannot use offset as a variable name, it is a reserved word for several teensy libraries
-                  direct_receiveValue(theoffset, thelength);  //CONSOLE_SERIALLink.read());                    
+                   // int valueOffset; //cannot use offset as a variable name, it is a reserved word for several teensy libraries
+                   direct_receiveValue(theoffset, thelength);  //CONSOLE_SERIALLink.read());                    
            break;
-       } //closes the switch/case 
+          } //closes the switch/case 
 }
-
 
 void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
 {      
@@ -276,34 +276,42 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
   void* pnt_configPage;//This only stores the address of the value that it's pointing to and not the max size
 
   switch (currentStatus.currentPage)
-  {
+        {
 
-    case 1: //simple_remote_setupPage:
-      pnt_configPage = &configPage1; //Setup a pointer to the relevant config page
-     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
-      if ( rvOffset < page_1_size)
-      {
-        *((uint8_t *)pnt_configPage + (uint8_t)rvOffset) = newValue; //
-      }
-      break;
+         case 1: //simple_remote_setupPage:
+               pnt_configPage = &configPage1; //Setup a pointer to the relevant config page
+               //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+               if ( rvOffset < page_1_size)
+                 {
+                  *((uint8_t *)pnt_configPage + (uint8_t)rvOffset) = newValue; //
+                 }
+         break;
 
-    case 2: //port editor config Page:
-      pnt_configPage = &configPage2; //Setup a pointer to the relevant config page
-     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
-      if ( rvOffset < page_2_size)
-      {
-        *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
-      }
-      break;
-  
-  }
+         case 2: //port editor config Page:
+               pnt_configPage = &configPage2; //Setup a pointer to the relevant config page
+               //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+               if ( rvOffset < page_2_size)
+                 {
+                  *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
+                 }
+         break;
+
+         case 3: //no saved data Page:
+               pnt_configPage = &configPage3; //Setup a pointer to the relevant config page
+               //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+               if ( rvOffset < page_3_size)
+                 {
+                  *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
+                 }
+         break;
+        }
 }
 
  //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*
 sendPage() packs the data within the current page (As set with the 'P' command)
 into a buffer and sends it.
-Note that some translation of the data is required to lay it out in the way Megasqurit / TunerStudio expect it
+Note that some translation of the data is required to lay it out in the way TunerStudio expects it
 useChar - If true, all values are send as chars, this is for the serial command line interface. TunerStudio expects data as raw values, so this must be set false in that case
 */
 void direct_sendPage(uint16_t send_page_offset, uint16_t send_page_Length, byte can_id, byte cmd)
@@ -311,55 +319,58 @@ void direct_sendPage(uint16_t send_page_offset, uint16_t send_page_Length, byte 
 
  //currentPage = pagenum;
  
-        void* pnt_configPage;
+  void* pnt_configPage;
 
-        switch (currentStatus.currentPage)
-          {
+  switch (currentStatus.currentPage)
+        {
 
-            case simple_remote_setupPage:  //veSetPage:
-                {
-                // currentTitleIndex = 27;
+         case simple_remote_setupPage:  //veSetPage:
+             {
+              // currentTitleIndex = 27;
 
-                pnt_configPage = &configPage1; //Create a pointer to Page 1 in memory  
-                  //send_page_Length = page_1_size; 
-                }
-            break;  
+              pnt_configPage = &configPage1; //Create a pointer to Page 1 in memory  
+              //send_page_Length = page_1_size; 
+             }
+         break;  
 
-            case port_editor_config:  //port editor config Page:
-                {
-                // currentTitleIndex = 27;
+         case port_editor_config:  //port editor config Page:
+             {              
+              pnt_configPage = &configPage2; //Create a pointer to Page 2 in memory  
+              //send_page_Length = page_2_size; 
+             }
+         break;
 
-                pnt_configPage = &configPage2; //Create a pointer to Page 2 in memory  
-                  //send_page_Length = page_2_size; 
-                }
-            break;
-
-          }
+         case no_saved_dataPage:  //no_saved_dataPage:
+             {              
+              pnt_configPage = &configPage3; //Create a pointer to Page 3 in memory               
+             }
+         break;
+        }
     
           //All other bytes can simply be copied from the config table
           
-          uint8_t response[send_page_Length];
-          for ( uint16_t x = 0; x < send_page_Length; x++)
-            {
-             // response[x] = *((uint8_t *)pnt_configPage + (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
-            response[x] = *((uint8_t *)pnt_configPage +(uint16_t)(send_page_offset)+ (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
-            }
+  uint8_t response[send_page_Length];
+  for ( uint16_t x = 0; x < send_page_Length; x++)
+     {
+      // response[x] = *((uint8_t *)pnt_configPage + (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
+      response[x] = *((uint8_t *)pnt_configPage +(uint16_t)(send_page_offset)+ (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
+     }
 
-          if (cmd == 206)   //came via passthrough from serial3
-            {
-              SERIALLink.print("r");
-              SERIALLink.write(thistsCanId);                //canId of the device you are requesting data from
-              SERIALLink.write(cmd);                       //  
-              SERIALLink.write(zero);                       // dummy offset lsb
-              SERIALLink.write(zero);                       // dummy offset msb
-              SERIALLink.write(lowByte(send_page_Length));  // length lsb
-              SERIALLink.write(highByte(send_page_Length)); // length msb
-              SERIALLink.write((uint8_t *)&response, sizeof(response));          
-            }
-          else
-          {  
-          CONSOLE_SERIALLink.write((uint8_t *)&response, sizeof(response));
-          }
+  if (cmd == 206)   //came via passthrough from serial3
+    {
+      SERIALLink.print("r");
+      SERIALLink.write(thistsCanId);                //canId of the device you are requesting data from
+      SERIALLink.write(cmd);                       //  
+      SERIALLink.write(zero);                       // dummy offset lsb
+      SERIALLink.write(zero);                       // dummy offset msb
+      SERIALLink.write(lowByte(send_page_Length));  // length lsb
+      SERIALLink.write(highByte(send_page_Length)); // length msb
+      SERIALLink.write((uint8_t *)&response, sizeof(response));          
+    }
+  else
+    {  
+      CONSOLE_SERIALLink.write((uint8_t *)&response, sizeof(response));
+    }
       
 }
 /*
@@ -376,8 +387,8 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
   byte fullStatus[direct_packetSize];
   byte response[packetLength];
 
-    if(direct_requestCount == 0) { currentStatus.secl = 0; }
-    direct_requestCount++;
+  if(direct_requestCount == 0) { currentStatus.secl = 0; }
+  direct_requestCount++;
 
   fullStatus[0] = currentStatus.secl; //secl is simply a counter that increments each second. Used to track unexpected resets (Which will reset this count to 0)
   fullStatus[1] = currentStatus.systembits; //Squirt Bitfield
@@ -463,18 +474,18 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
   fullStatus[79] = lowByte(currentStatus.EXin[15]);
   fullStatus[80] = highByte(currentStatus.EXin[15]);    
   
-    for(byte x=0; x<packetLength; x++)
-  {
-    response[x] = fullStatus[offset+x];
-  }
+  for(byte x=0; x<packetLength; x++)
+     {
+      response[x] = fullStatus[offset+x];
+     }
 
   if (cmd == 60)
-    {
+     {
       CONSOLE_SERIALLink.write(response, (size_t)packetLength); 
       //CONSOLE_SERIALLink.write(response, (size_t)packetLength);
-    }
+     }
   else if (cmd == 180)
-    {
+     {
       //CONSOLE_SERIALLink.print("r was sent");
       SERIALLink.write("r");         //confirm cmd letter 
       SERIALLink.write(zero);           //canid
@@ -484,68 +495,104 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
       SERIALLink.write(lowByte(packetLength));      //confirm no of byte to be sent
       SERIALLink.write(highByte(packetLength));      //confirm no of byte to be sent
       SERIALLink.write(response, (size_t)packetLength); //stream the realtime data requested
-    }   
+     }   
   return;
 }
 
-void commandButtons(uint16_t cmdCombined)
+void commandButtons(uint16_t cmdCombined, uint16_t cmdData)
 {
 
   switch (cmdCombined)
-  {   
-    case 256: // cmd is stop    
-      BIT_CLEAR(currentStatus.testIO_hardware, 1);    //clear testactive flag
-      currentStatus.digOut = 0;                   //reset all outputs to off
-      break;
+        {   
+         case 256: // cmd is stop    
+                  BIT_CLEAR(currentStatus.testIO_hardware, 1);    //clear testactive flag. do not clear bit 0 as this is done in main loop after driveoutputs()
+                  currentStatus.digOut = 0;                       //reset all outputs to off , they will go back to their correct status at next check in main loop
+         break;
 
-    case 257: // cmd is enable
-      // currentStatus.testactive = 1;
-      BIT_SET(currentStatus.testIO_hardware, 0);  //set testenabled flag    
-      BIT_SET(currentStatus.testIO_hardware, 1);  //set testactive flag
-      break;
+         case 257: // cmd is enable
+                  // currentStatus.testactive = 1;
+                  BIT_SET(currentStatus.testIO_hardware, 0);  //set testenabled flag    
+                  BIT_SET(currentStatus.testIO_hardware, 1);  //set testactive flag
+         break;
           
-    case 513:
-    case 514:
-    case 515:
-    case 516:
-    case 517:
-    case 518:
-    case 519:
-    case 520:
-    case 521:
-    case 522:
-    case 523:
-    case 524:
-    case 525:
-    case 526:
-    case 527:
-    case 528: // cmd group is on actions
-      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
-        {
-          BIT_SET(currentStatus.digOut, (cmdCombined-513));
-        }
-      break;
+         case 513:
+         case 514:
+         case 515:
+         case 516:
+         case 517:
+         case 518:
+         case 519:
+         case 520:
+         case 521:
+         case 522:
+         case 523:
+         case 524:
+         case 525:
+         case 526:
+         case 527:
+         case 528: // cmd group is on actions
+                  if(BIT_CHECK(currentStatus.testIO_hardware, 1))
+                    {
+                     BIT_SET(currentStatus.digOut, (cmdCombined-513));
+                    }
+         break;
       
-    case 769: // cmd group is off actions
-    case 770:
-    case 771:
-    case 772:
-    case 773:
-    case 774:
-    case 775:
-    case 776:
-    case 777:
-    case 778:
-    case 779:
-    case 780:
-    case 781:
-    case 782:
-    case 783:
-    case 784:
-      if(BIT_CHECK(currentStatus.testIO_hardware, 1))
-        {
-          BIT_CLEAR(currentStatus.digOut, (cmdCombined-769));
+         case 769: // cmd group is off actions
+         case 770:
+         case 771:
+         case 772:
+         case 773:
+         case 774:
+         case 775:
+         case 776:
+         case 777:
+         case 778:
+         case 779:
+         case 780:
+         case 781:
+         case 782:
+         case 783:
+         case 784:
+                  if(BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTACTIVE))
+                    {
+                     BIT_CLEAR(currentStatus.digOut, (cmdCombined-769));
+                    }
+         break;
+
+         case 1280: // cmd is ainteststop    
+                  BIT_CLEAR(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_AINTESTACTIVE);    //clear aintestactive flag. do not clear bit 0 as this is done in main loop after driveoutputs()                  
+                  currentStatus.aintestsent = 0;
+                  
+         break;
+
+         case 1281: // cmd is aintestenable
+                  BIT_SET(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_AINTESTENABLED);  //set aintestenabled flag    
+                  BIT_SET(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_AINTESTACTIVE);  //set aintestactive flag
+         break;
+         
+         case 1537: // cmd group 
+         case 1538:
+         case 1539:
+         case 1540:
+         case 1541:
+         case 1542:
+         case 1543:
+         case 1544:
+         case 1545:
+         case 1546:
+         case 1547:
+         case 1548:
+         case 1549:
+         case 1550:
+         case 1551:
+         case 1552:
+                  if(BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_AINTESTACTIVE))         //if the ain tests are enabled
+                    {
+                     currentStatus.Analog[(cmdCombined-1537)] = (configPage3.aintestData[(cmdCombined-1537)])<<2;
+                     //currentStatus.dev1 = configPage3.aintestData[(cmdCombined-1537)];
+                     BIT_SET(currentStatus.aintestsent, (cmdCombined-1537));  //set aintestenabled flag     
+                     //BIT_CLEAR(currentStatus.digOut, (cmdCombined-1537));
+                    }
+         break;
         }
-      break;
-  }
 }        

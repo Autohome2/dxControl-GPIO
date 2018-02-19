@@ -6,7 +6,7 @@ void driveDisplay()
     then read the data directly from the variables
     currentStatus.EXin[0] to currentStatus.EXin[15] 
 */  
-#if defined DISP1_ACTIVE 
+#if DISP1_ACTIVE == 1
       u8g2_1.setFont(u8g2_font_ncenB14_tr);
       u8g2_1.firstPage();
       do {
@@ -21,7 +21,7 @@ void driveDisplay()
           } while ( u8g2_1.nextPage() );
 #endif
 
-#if defined DISP2_ACTIVE  
+#if DISP2_ACTIVE == 1 
       u8g2_2.firstPage();
       do {
           u8g2_2.setFont(u8g2_font_logisoso58_tr);
@@ -32,10 +32,10 @@ void driveDisplay()
 
 void initialise_display()
 {
-#if defined DISP1_ACTIVE 
+#if DISP1_ACTIVE == 1 
     u8g2_1.begin();
 #endif    
-#if defined DISP2_ACTIVE
+#if DISP2_ACTIVE == 1
     u8g2_2.begin();
 #endif
 } 

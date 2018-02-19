@@ -30,15 +30,15 @@ A full copy of the license may be found in the speeduino projects root directory
 #include <U8g2lib.h>
 
   // stm32 pin assignments
-#if defined (CORE_STM32)//(MCU_STM32F103C8)
+#if defined (CORE_STM32)
   #if defined (USE_EXT_FRAM)
     #include "Adafruit_FRAM_SPI.h"
     /* Example code for the Adafruit SPI FRAM breakout */
     uint8_t FRAM_CS = PA15;//10;
- //   Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_CS);  // use hardware SPI
-    uint8_t FRAM_SCK= PB3;//13;
-    uint8_t FRAM_MISO = PB4;//12;
-    uint8_t FRAM_MOSI = PB5;//11;
+    //   Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_CS);  // use hardware SPI
+    uint8_t FRAM_SCK= PB3;
+    uint8_t FRAM_MISO = PB4;
+    uint8_t FRAM_MOSI = PB5;
     //Or use software SPI, any pins!
     Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_SCK, FRAM_MISO, FRAM_MOSI, FRAM_CS);
     #endif
@@ -78,6 +78,7 @@ A full copy of the license may be found in the speeduino projects root directory
 
 struct config1 configPage1;
 struct config2 configPage2;
+struct config3 configPage3;
 struct statuses currentStatus;
 
 volatile int mainLoopCount;
@@ -87,7 +88,7 @@ volatile byte driveoutloop;
 volatile byte EXinchanloop;
 
 //configure screen 1 display initialise options
-#if defined DISP1_ACTIVE
+#if DISP1_ACTIVE == 1
     #if defined DISP1_USE_SSD1106_I2C
         U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_1(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);   
     #elif defined DISP1_USE_SSD1306_I2C 
@@ -101,7 +102,7 @@ volatile byte EXinchanloop;
 #endif    
 
 //configure screen 2 display initialise options
-#if defined DISP2_ACTIVE
+#if DISP2_ACTIVE == 1
     #if defined DISP2_USE_SSD1106_I2C
         U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2_2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE); 
     #elif defined DISP2_USE_SSD1306_I2C 
@@ -149,101 +150,104 @@ void loop()
       // 1) Every 64 loops (64 Is more than fast enough for TunerStudio). This function is equivalent to ((loopCount % 64) == 1) but is considerably faster due to not using the mod or division operations
       // 2) If the amount of data in the serial buffer is greater than a set threhold (See globals.h). This is to avoid serial buffer overflow when large amounts of data is being sent
       if (BIT_CHECK(TIMER_mask, BIT_TIMER_25HZ))
-      //if ( ((mainLoopCount & 31) == 1) or (SERIALLink.available() > 32) )
+          //if ( ((mainLoopCount & 31) == 1) or (SERIALLink.available() > 32) )
         {
           if (SERIALLink.available() > 0)      // if SERIALLink has data then do the remote serial command subroutine
             {
               remote_serial_command();
             }             
-       // if ( ((mainLoopCount & 31) == 1) or (Serial.available() > 32) )          
-            if (CONSOLE_SERIALLink.available() > 0)      // if CONSOLE_SERIALLink has data then do the direct serial command subroutine(Typical TS link)
-              {
-                direct_serial_command();
-              }
-         BIT_CLEAR(TIMER_mask, BIT_TIMER_25HZ);
-         }
-          
-      if  (SERIALLink.available() > 32) 
-        {
-          if (SERIALLink.available() > 0)      // if SERIALLink has data then do the remote serial command subroutine
-            {
-              remote_serial_command();
-            }
-        }     
-        
-     if  (CONSOLE_SERIALLink.available() > 32) 
-        {
+          // if ( ((mainLoopCount & 31) == 1) or (Serial.available() > 32) )          
           if (CONSOLE_SERIALLink.available() > 0)      // if CONSOLE_SERIALLink has data then do the direct serial command subroutine(Typical TS link)
             {
               direct_serial_command();
             }
+          BIT_CLEAR(TIMER_mask, BIT_TIMER_25HZ);
+        }
+          
+      if (SERIALLink.available() > 32) 
+        {
+         if (SERIALLink.available() > 0)      // if SERIALLink has data then do the remote serial command subroutine
+           {
+            remote_serial_command();
+           }
+        }     
+        
+      if (CONSOLE_SERIALLink.available() > 32) 
+        {
+         if (CONSOLE_SERIALLink.available() > 0)      // if CONSOLE_SERIALLink has data then do the direct serial command subroutine(Typical TS link)
+           {
+            direct_serial_command();
+           }
         }
                       
-      if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_4HZ)) //4 hertz
-        {
-             for (byte EXinchanloop = 0; EXinchanloop <16 ; EXinchanloop++)
+      if (BIT_CHECK(LOOP_TIMER, BIT_TIMER_4HZ)) //4 hertz
+         {
+          for (byte EXinchanloop = 0; EXinchanloop <16 ; EXinchanloop++)
+             {
+              if (BIT_CHECK(configPage1.exinsel,EXinchanloop))
                 {
-                 if (BIT_CHECK(configPage1.exinsel,EXinchanloop))
-                   {
-                    getExternalInput(EXinchanloop);
-                   }        // read the external inputs if enabled                           
-                }   
+                 getExternalInput(EXinchanloop);
+                }        // read the external inputs if enabled                           
+             }   
 
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_4HZ);                         
-        }
+         }
 
-      if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_10HZ)) //10 hertz
-        {
-           driveDisplay(); 
-           if (configPage1.exinsel !=0)  //if any of the external input channels are enabled
-             {
-              // send an "A" request
-              getExternalInput(0xFF);
-             }
+      if (BIT_CHECK(LOOP_TIMER, BIT_TIMER_10HZ)) //10 hertz
+         {
+          driveDisplay(); 
+          if (configPage1.exinsel !=0)  //if any of the external input channels are enabled
+            {
+             // send an "A" request
+             getExternalInput(0xFF);
+            }
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_10HZ);                         
-        }
+         }
 
-      if(BIT_CHECK(LOOP_TIMER, BIT_TIMER_15HZ)) //15 hertz
+      if (BIT_CHECK(LOOP_TIMER, BIT_TIMER_15HZ)) //15 hertz
         {
-          //Nothing here currently
-          BIT_CLEAR(TIMER_mask, BIT_TIMER_15HZ);
+         //Nothing here currently
+         BIT_CLEAR(TIMER_mask, BIT_TIMER_15HZ);
 
-          for (byte Achan = 1; Achan <17 ; Achan++)
-             {
-              if (pinAin[Achan] < 255) {readAnalog(Achan);}        // if analog pin is in use read the analog inputs
-             }
-
-          for (byte diginchanloop = 0; diginchanloop <16 ; diginchanloop++)
+         for (byte Achan = 1; Achan <17 ; Achan++)
             {
-             if (pinIn[diginchanloop] < 255) { readDigitalIn(diginchanloop);}        // if pin is not set to 0 then is in use so read the digital input
-          //      if (diginchanloop < 16)
-          //      {
-          //        diginchanloop++;
-          //      }
-          //    else
-          //      {
-          //        diginchanloop = 0;
-          //      }
+             if(!BIT_CHECK(currentStatus.aintestsent, (Achan-1)))         //
+                    { 
+                      if (pinAin[Achan] < 255) {readAnalog(Achan);}        // if analog pin is in use read the analog inputs
+                    }  
             }
+
+         //for (byte diginchanloop = 0; diginchanloop <16 ; diginchanloop++)
+         //   {
+         //    if (pinIn[diginchanloop] < 255) { readDigitalIn(diginchanloop);}        // if pin is not set to 0 then is in use so read the digital input
+               //      if (diginchanloop < 16)
+               //      {
+               //        diginchanloop++;
+               //      }
+               //    else
+               //      {
+               //        diginchanloop = 0;
+               //      }
+         //   }
             
-              if(!BIT_CHECK(currentStatus.testIO_hardware, 1))
-                {
-                  for (byte Dinchan = 1; Dinchan <17 ; Dinchan++)
-                      {
-                        if (pinIn[Dinchan] < 255) { readDigitalIn(Dinchan);}        // if pin is not set to 0 then is in use so read the digital input
-                      }
-                }
-              driveOutputs();
+         if (!BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTACTIVE))                  // if NOT in hardware test mode then read the digital inputs
+           {
+            for (byte Dinchan = 1; Dinchan <17 ; Dinchan++)
+               {
+                if (pinIn[Dinchan] < 255) { readDigitalIn(Dinchan);}        // if pin is not set to 0 then is in use so read the digital input
+               }
+           }
+         driveOutputs();
  
-              if(BIT_CHECK(currentStatus.testIO_hardware, 0)) //if testenabled is set 
-                {   
-                  if(BIT_CHECK(currentStatus.testIO_hardware, 1) == 0) //and if testactive is clear 
-                    {
-                     BIT_CLEAR(currentStatus.testIO_hardware, 0);    //clear testenabled flag now all outputs have been forced
-                    }
-                }   
+         if (BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTENABLED)) //if testenabled is set 
+           {   
+            if (BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTACTIVE) == 0) //and if testactive is clear 
+              {
+               BIT_CLEAR(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTENABLED);    //clear testenabled flag now all outputs have been forced
+              }
+           }   
                 
-       }                  
+        }                  
 }
