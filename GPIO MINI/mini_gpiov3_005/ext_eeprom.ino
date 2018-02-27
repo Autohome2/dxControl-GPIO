@@ -1,9 +1,7 @@
-#if defined (USE_EXT_EEPROM)
-
-//defined (CORE_STM32)&& 
-
-#include "ext_eeprom.h"
-
+#if defined (CORE_STM32)         
+    #if USE_EXT_EEPROM == 1
+        #include "ext_eeprom.h"
+    #endif
 void init_stm32_ext_eeprom(uint8_t spiport)
 {
   if (spiport == 1)
@@ -28,6 +26,10 @@ void init_stm32_ext_eeprom(uint8_t spiport)
   }
 }
 
+#elif defined (CORE_SAMD)
+      #if USE_EXT_EEPROM == 1
+          #include "ext_eeprom.h"
+      #endif     
 void init_sam_ext_eeprom(uint8_t spiport)
 {
   if (spiport == 1)
@@ -38,11 +40,11 @@ void init_sam_ext_eeprom(uint8_t spiport)
   // Setup fext eeprom to use SPI 1
   SPI.begin(); //Initialize the SPI_1 port.
   
-  //SPI.setBitOrder(MSBFIRST); // Set the SPI_1 bit order
-  //SPI.setDataMode(SPI_MODE0); //Set the  SPI_2 data mode 0
+  SPI.setBitOrder(MSBFIRST); // Set the SPI_1 bit order
+  SPI.setDataMode(SPI_MODE0); //Set the  SPI_1 data mode 0
   //SPI.setClockDivider(SPI_CLOCK_DIV8);      // Slow speed (72 / 16 = 4.5 MHz SPI_1 speed)
-  //pinMode(SPI1_NSS_PIN, OUTPUT);
-  //slaveselectPin =  SPI1_NSS_PIN;
+  pinMode(SPI1_NSS_PIN, OUTPUT);
+  slaveselectPin =  SPI1_NSS_PIN;
   
     // initalize the  data ready and chip select pins:
   //pinMode(dataReadyPin, INPUT);
@@ -50,6 +52,8 @@ void init_sam_ext_eeprom(uint8_t spiport)
   
   }
 }
+
+
 /*
  * print_page_bytes() is a simple helperf function that formats 256
  * bytes of data into an easier to read grid.

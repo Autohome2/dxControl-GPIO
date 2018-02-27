@@ -36,6 +36,10 @@ void initialiseTimers()
    //Enable the watchdog timer for 2 second resets (Good reference: https://tushev.org/articles/arduino/5/arduino-and-watchdog-timer)
    //wdt_enable(WDTO_2S); //Boooooooooo WDT is currently broken on Mega 2560 bootloaders :(
 
+#elif defined (CORE_SAMD)
+   //uses the avdweb timer lib
+ //  SAMDtimer lowResTimer =  SAMDtimer(4, oneMS_ISR, 1e3);   
+   
 #elif defined (CORE_TEENSY)
    //Uses the PIT timer on Teensy.
    lowResTimer.begin(oneMSInterval, 1000);
@@ -52,10 +56,16 @@ void initialiseTimers()
 
 //Timer2 Overflow Interrupt Vector, called when the timer overflows.
 //Executes every ~1ms.
+
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO) //AVR chips use the ISR for this
 ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
-#elif defined (CORE_TEENSY) || defined(CORE_STM32)  //(MCU_STM32F103C8)
+
+#elif defined (CORE_TEENSY) || defined(CORE_STM32)   //(MCU_STM32F103C8)
 void oneMSInterval() //Most ARM chips can simply call a function
+
+#elif defined (CORE_SAMD)
+void oneMS_ISR (struct tc_module *const module_inst)
+
 #endif
 {
 
@@ -112,7 +122,7 @@ void oneMSInterval() //Most ARM chips can simply call a function
     
     if (celBlink == celBlink_time)
     {
-      digitalWrite(LED_BUILTIN,0);
+      //digitalWrite(LED_BUILTIN,0);
     }
     
     loopSec = 0; //Reset counter.
@@ -128,6 +138,7 @@ void oneMSInterval() //Most ARM chips can simply call a function
     //**************************************************************************************************************************************************
 
   }
+  
 //#if defined(CORE_AVR)
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)|| defined (ARDUINO_AVR_PRO)  //AVR chips use the ISR for this
     //Reset Timer2 to trigger in another ~1ms

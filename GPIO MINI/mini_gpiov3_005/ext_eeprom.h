@@ -1,6 +1,8 @@
 #ifndef EXT_EEPROM_H
 #define EXT_EEPROM_H
 
+#if defined (CORE_STM32)
+
 /*
     Using the first SPI port (SPI_1)
     SS    <-->  PA4 <-->  BOARD_SPI1_NSS_PIN
@@ -16,8 +18,12 @@
 */
 
 
-#define SPI1_NSS_PIN PA4    //SPI_1 Chip Select pin is PA4. You can change it to the STM32 pin you want.
-#define SPI2_NSS_PIN PB12   //SPI_2 Chip Select pin is PB12. You can change it to the STM32 pin you want.
+  #define SPI1_NSS_PIN  PA4    //SPI_1 Chip Select pin is PA4. You can change it to the STM32 pin you want.
+  #define SPI2_NSS_PIN  PB12   //SPI_2 Chip Select pin is PB12. You can change it to the STM32 pin you want.
+
+#elif defined(CORE_SAMD)
+  #define SPI1_NSS_PIN  4    //SPI_1 Chip Select pin is 4. You can change it to the SAM pin you want.
+#endif
 
 // WinBond flash commands
 #define WB_WRITE_ENABLE       0x06
@@ -31,8 +37,11 @@
 
 byte slaveselectPin ;
 
-void init_stm32_ext_eeprom(uint8_t spiport);
-void init_sam_ext_eeprom(uint8_t spiport);
+#if defined (CORE_STM32) 
+    void init_stm32_ext_eeprom(uint8_t spiport);
+#elif defined (CORE_SAMD)    
+    void init_sam_ext_eeprom(uint8_t spiport);
+#endif
 
 void print_page_bytes(uint16_t *page_buffer,uint16_t dataleng);
 void print_single_byte(byte *page_buffer, byte bytenum);

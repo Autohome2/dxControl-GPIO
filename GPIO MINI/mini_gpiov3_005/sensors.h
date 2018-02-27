@@ -9,6 +9,7 @@ void readDigitalIn(uint8_t DinCH);
 void getAnalogBYoffset(uint8_t AinCH, uint8_t readloop);
 
 unsigned int tempReading;
+#define ADC_RESOLUTION_BITS  10
 
     
 #endif

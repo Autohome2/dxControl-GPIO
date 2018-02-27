@@ -1,5 +1,5 @@
 /*
-mini GPIO V3.001. 
+mini GPIO V3.005. 
 supports Speeduino Secondary serial port data transfer.
 On Mega2560 version this is Serial3.
 Copyright (C) Darren Siepka
@@ -26,37 +26,51 @@ A full copy of the license may be found in the speeduino projects root directory
   #include <EEPROM.h>
 #endif
 
+#if defined (CORE_SAMD)
+  #include "avdweb_SAMDtimer.h"
+   //uses the avdweb timer lib
+   SAMDtimer lowResTimer =  SAMDtimer(4, oneMS_ISR, 1e3);
+#endif
+  
 #include <SPI.h>
 #include <Wire.h>
 
-#include <U8g2lib.h>
+//#include <U8g2lib.h>
 
   // stm32 pin assignments
   #if defined (CORE_STM32)
-  //#if defined (USE_EXT_FRAM)
-  //  #include "Adafruit_FRAM_SPI.h"
-    /* Example code for the Adafruit SPI FRAM breakout */
-  //  uint8_t FRAM_CS = PA15;//10;
-    //   Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_CS);  // use hardware SPI
-  //  uint8_t FRAM_SCK= PB3;
-  //  uint8_t FRAM_MISO = PB4;
-  //  uint8_t FRAM_MOSI = PB5;
-    //Or use software SPI, any pins!
-  //  Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_SCK, FRAM_MISO, FRAM_MOSI, FRAM_CS);
-  //  #endif
-  
-  //#if defined (USE_EXT_FLASH)
-    //#include <SPI.h>
- //   #include "stm32_flash.h"
- //   SPIClass SPI_2(2); //Create an instance of the SPI Class called SPI_2 that uses the 2nd SPI Port   
- // #endif
-
-  #if defined (USE_EXT_EEPROM)
-    //#include <SPI.h>
-    #include "ext_eeprom.h"
-//    SPIClass SPI_2(2); //Create an instance of the SPI Class called SPI_2 that uses the 2nd SPI Port   
+      #if USE_EXT_FRAM == 1
+          #include "Adafruit_FRAM_SPI.h"
+          /* Example code for the Adafruit SPI FRAM breakout */
+          uint8_t FRAM_CS = PA15;//10;
+          Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_CS);  // use hardware SPI
+          //  uint8_t FRAM_SCK= PB3;
+         //  uint8_t FRAM_MISO = PB4;
+         //  uint8_t FRAM_MOSI = PB5;
+         //Or use software SPI, any pins!
+         //  Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_SCK, FRAM_MISO, FRAM_MOSI, FRAM_CS);
+      #elif USE_EXT_EEPROM == 1
+          #include "ext_eeprom.h"
+          //    SPIClass SPI_2(2); //Create an instance of the SPI Class called SPI_2 that uses the 2nd SPI Port   
+      #endif
   #endif
-
+  
+  // SAM pin assignments
+  #if defined (CORE_SAMD)
+      #if USE_EXT_FRAM == 1
+          #include "Adafruit_FRAM_SPI.h"
+          /* Example code for the Adafruit SPI FRAM breakout */
+          uint8_t FRAM_CS = 10;
+          Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_CS);  // use hardware SPI
+         //  uint8_t FRAM_SCK= PB3;
+         //  uint8_t FRAM_MISO = PB4;
+         //  uint8_t FRAM_MOSI = PB5;
+         //Or use software SPI, any pins!
+         //  Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_SCK, FRAM_MISO, FRAM_MOSI, FRAM_CS);
+      #elif USE_EXT_EEPROM == 1
+         #include "ext_eeprom.h"
+        //    SPIClass SPI_2(2); //Create an instance of the SPI Class called SPI_2 that uses the 2nd SPI Port   
+      #endif
   #endif
 
 // setup which serial port connects to the speeduino secondary serial
@@ -64,14 +78,20 @@ A full copy of the license may be found in the speeduino projects root directory
     // mega pin assignments
     HardwareSerial &SERIALLink = Serial3;
 
-#elif defined(CORE_SAMD)
-    HardwareSerial &SERIALLink = Serial1;
+//#elif defined(D21E_REVB_SAMC21E18A)
+//    HardwareSerial &SERIALLink = Serial1;        
+
+#elif defined(ARDUINO_ZERO)
+    HardwareSerial &SERIALLink = Serial1;           // pins 0 (RX) and 1 (TX)
 
 #elif defined(CORE_STM32)// && defined(F407_STM32)
     #define SERIALLink Serial2
 
 #elif defined(ARDUINO_NUCLEO_64)//(CORE_STM32)
     #define SERIALLink Serial1   
+
+#elif defined(__MK64FX512__)    //teensy3.5
+    #define SERIALLink Serial1
 #else
     #error no seriallink defined for board selected . Please select the correct board (Usually Mega 2560) and upload again  
 #endif 
@@ -80,11 +100,26 @@ A full copy of the license may be found in the speeduino projects root directory
 #if defined(ARDUINO_AVR_MEGA2560)
     HardwareSerial &CONSOLE_SERIALLink = Serial;
 
-#elif defined(CORE_SAMD)
-    #define CONSOLE_SERIALLink SerialUSB;
-    
+//#elif defined(D21E_REVB_SAMC21E18A)
+//    HardwareSerial & CONSOLE_SERIALLink = Serial;
+
+#elif defined(ARDUINO_ZERO)
+    #if USE_NATIVE == 1
+      HardwareSerial & CONSOLE_SERIALLink = SerialUSB;    //the native usb port on a arduino zero 
+    #elif USE_PROG == 1
+      HardwareSerial & CONSOLE_SERIALLink = Serial;       //the programming usb port on a arduino zero     
+    #endif
+      
 #elif defined (CORE_STM32)
-    #define CONSOLE_SERIALLink Serial1 
+    #if CONSOLE_USE_SER1 == 1
+      #define CONSOLE_SERIALLink Serial1 
+    #elif CONSOLE_USE_SER2 == 1
+      #define CONSOLE_SERIALLink Serial2   
+    #endif
+
+#elif defined(__MK64FX512__)
+    #define CONSOLE_SERIALLink Serial 
+    
 #else
     #error no console_seriallink defined for board selected . Please select the correct board (Usually Mega 2560) and upload again      
 #endif
@@ -162,19 +197,16 @@ volatile byte EXinchanloop;
 
 void setup() {
   // put your setup code here, to run once:
+  //first initialise the NV storage memory
   #if defined (CORE_STM32)
-      #if defined(USE_EXT_FLASH)
-          init_stm32_flash(1);
-      #endif
-
-      #if  defined(USE_EXT_EEPROM)
-           init_stm32_ext_eeprom(1);
+      #if USE_EXT_EEPROM == 1
+          init_stm32_ext_eeprom(1);
       #endif
   #endif
   
   #if defined (CORE_SAMD)
-        #if  defined(USE_EXT_EEPROM)
-           init_sam_ext_eeprom(1);
+      #if USE_EXT_EEPROM == 1
+            init_sam_ext_eeprom(1);
       #endif
   #endif
   
@@ -214,6 +246,9 @@ void loop()
               direct_serial_command();
             }
           BIT_CLEAR(TIMER_mask, BIT_TIMER_25HZ);
+          driveDisplay(displayloop);
+          if (displayloop < 5) {displayloop++;}        //cycle through each display channel on each call of the 25HZ routine.
+          else displayloop = 1;           
         }
           
       if (SERIALLink.available() > 32) 
@@ -238,7 +273,7 @@ void loop()
              {
               if (BIT_CHECK(configPage1.exinsel,EXinchanloop))
                 {
-                 getExternalInput(EXinchanloop);
+         //        getExternalInput(EXinchanloop);
                 }        // read the external inputs if enabled                           
              }   
 
@@ -247,12 +282,11 @@ void loop()
          }
 
       if (BIT_CHECK(LOOP_TIMER, BIT_TIMER_10HZ)) //10 hertz
-         {
-          driveDisplay(); 
+         {                      
           if (configPage1.exinsel !=0)  //if any of the external input channels are enabled
             {
              // send an "A" request
-             getExternalInput(0xFF);
+          //   getExternalInput(0xFF);
             }
           //Nothing here currently
           BIT_CLEAR(TIMER_mask, BIT_TIMER_10HZ);                         
@@ -270,25 +304,12 @@ void loop()
                       if (pinAin[Achan] < 255) {readAnalog(Achan);}        // if analog pin is in use read the analog inputs
                     }  
             }
-
-         //for (byte diginchanloop = 0; diginchanloop <16 ; diginchanloop++)
-         //   {
-         //    if (pinIn[diginchanloop] < 255) { readDigitalIn(diginchanloop);}        // if pin is not set to 0 then is in use so read the digital input
-               //      if (diginchanloop < 16)
-               //      {
-               //        diginchanloop++;
-               //      }
-               //    else
-               //      {
-               //        diginchanloop = 0;
-               //      }
-         //   }
             
          if (!BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTACTIVE))                  // if NOT in hardware test mode then read the digital inputs
            {
             for (byte Dinchan = 1; Dinchan <17 ; Dinchan++)
                {
-                if (pinIn[Dinchan] < 255) { readDigitalIn(Dinchan);}        // if pin is not set to 0 then is in use so read the digital input
+                 if (pinIn[Dinchan] < 255) { readDigitalIn(Dinchan);}        // if pin is not set to 0 then is in use so read the digital input
                }
            }
          driveOutputs();
@@ -299,7 +320,6 @@ void loop()
               {
                BIT_CLEAR(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTENABLED);    //clear testenabled flag now all outputs have been forced
               }
-           }   
-                
+           }                  
         }                  
 }

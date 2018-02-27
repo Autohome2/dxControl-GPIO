@@ -2,27 +2,40 @@
 #define GLOBALS_H
 #include <Arduino.h>
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
+#if defined(__AVR__)
+//(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
   #define BOARD_NR_GPIO_PINS 54
   #define LED_BUILTIN 13
   #define CORE_AVR
   #define USE_INT_EEPROM
   
 #elif defined(ARDUINO_ARCH_SAMD)
-  #define CORE_SAMD
-  #define USE_EXT_EEPROM
+      #define CORE_SAMD
+      #define USE_INT_EEPROM        0
+      #define USE_EXT_EEPROM        1
   
 #elif defined(CORE_TEENSY)
-  #define BOARD_NR_GPIO_PINS 34
+      #define USE_INT_EEPROM
+      #if defined(__MK64FX512__)
+          #define TEENSY3_5
+          #define BOARD_NR_GPIO_PINS 34
+      #elif defined (__MK66FX1M0__)
+          #define TEENSY3_6
+#else 
+    #error "unknown board"      
+#endif
   
 #elif defined(STM32_MCU_SERIES) || defined(_VARIANT_ARDUINO_STM32_) || (defined (ARDUINO_ARCH_STM32))     //the arch_stm32 comes from the stm32generic core addition
       #define CORE_STM32
 //      #define LED_BUILTIN PC13
       //only choose one of the following two defines , comment out the unused ones
-      #define USE_INT_EEPROM
-   // #define USE_EXT_FLASH
-//      #define USE_EXT_EEPROM
-  //  #define USE_EXT_FRAM
+      #define USE_INT_EEPROM       1
+      #define USE_EXT_FLASH        0
+      #define USE_EXT_EEPROM       0
+      #define USE_EXT_FRAM         0
+
+      #define CONSOLE_USE_SER1     1        //select only one CONSOLE_USE_x
+      #define CONSOLE_USE_SER2     0      // to choose which serial connects to TS
   
       //#define EXT_FLASH_SIZE 8192
       //#define FLASH_OFFSET  EXT_FLASH_SIZE / 2
@@ -39,14 +52,14 @@
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
   #define MEGA_AVR
 
-#elif defined(ARDUINO_AVR_PRO)
+#elif defined(ARDUINO_AVR_PRO)                      // pro mini ,nano or uno mcu type
   #define 328_AVR
 
 #elif defined(ARDUINO_AVR_324)
   #define 324_AVR  
 
-#elif defined(ARDUINO_SAMD_ZERO)
-  #define SAMD_ZERO
+//#elif defined(ARDUINO_SAMD_ZERO)
+//  #define SAMD_ZERO
   
 #elif defined(ARDUINO_Nucleo_64)
   #define NUCLEO_64_STM32
@@ -60,9 +73,19 @@
 #elif defined(MCU_STM32F407VGT6)
   #define F407_STM32  
 
-#elif defined (MATTAIRTECH_ARDUINO_SAMD_ZERO)
-  #define d21e_revb
+//#elif defined (MATTAIRTECH_ARDUINO_SAMD_ZERO)
+//  #define D21E_REVB
 
+#elif defined (__SAMD21G18A__)                        // this is the arduino zero mcu type
+  #define ARDUINO_ZERO
+  #define USE_NATIVE         0                        // select  this or USE_PROG but not both
+  #define USE_PROG           1                        // to choose which serial port is connected to TS
+
+#elif defined (MATTAIRTECH_ARDUINO_SAMD_ZERO_SAMC21E18A)
+  #define D21E_REVB_SAMC21E18A
+  
+#elif defined(__MK64FX512__)                               // teensy 3.5 mcu type
+     #define TEENSY3_5
 #else
   #error Specific board not detected. Please select the correct board (Usually Mega 2560) and upload again
     
@@ -99,6 +122,7 @@ uint16_t theoffset, thelength;  //used with serial data
 #define BIT_TIMER_15HZ            3
 #define BIT_TIMER_25HZ            4
 #define BIT_TIMER_30HZ            5
+
 #define celBlink_time             4   //4 seconds
 
 //testIO_hardware bit fields

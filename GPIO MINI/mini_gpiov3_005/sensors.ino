@@ -9,7 +9,11 @@ void initialiseADC()
      BIT_SET(ADCSRA,ADPS2);
      BIT_CLEAR(ADCSRA,ADPS1);
      BIT_CLEAR(ADCSRA,ADPS0); 
-     #endif
+     
+#elif defined (CORE_SAMD)
+       analogReadResolution(ADC_RESOLUTION_BITS);
+
+#endif  
 }
 
 void readAnalog(uint8_t AinCH)

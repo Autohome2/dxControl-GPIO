@@ -8,14 +8,14 @@
 
 //set display 1 type
 
-#define DISP1_ACTIVE         1
+#define DISP1_ACTIVE         0
 #define DISP1_SPI_I2C        1          // 0 == SPI , 1 == I2C
 
 //if I2C set these next three values
 #define DISP1_ADDRESS        0          //direct i2c == 0 , specified address == screen address
 #define DISP1_I2C_MUX_ROUTE  0x70       // direct i2c == 0 , via mux == mux address
 #define DISP1_TCA_ROUTE_OUT  0          // the output port on the tca9548 screen is connected to if mux in use , set to 255 if not used
-
+        
 //only choose one of the following defines for display type selection  , comment out the unused ones
 #define DISP1_USE_SSD1106_I2C
 //#define DISP1_USE_SSD1306_I2C
@@ -37,7 +37,7 @@
 //display 2
 
 //set display 2 type
-#define DISP2_ACTIVE         1 
+#define DISP2_ACTIVE         0 
 #define DISP2_SPI_I2C        1             // 0 == SPI , 1 == I2C
 
 //if I2C set these next three values
@@ -61,7 +61,7 @@
 
 //set display 3 type
 
-#define DISP3_ACTIVE         1
+#define DISP3_ACTIVE         0
 #define DISP3_SPI_I2C        1             // 0 == SPI , 1 == I2C
 
 //if I2C set these next three values
@@ -90,7 +90,7 @@
 //display 4
 
 //set display 4 type
-#define DISP4_ACTIVE          1 
+#define DISP4_ACTIVE          0 
 #define DISP4_SPI_I2C         1             // 0 == SPI , 1 == I2C
 
 //if I2C set these next three values
@@ -120,5 +120,7 @@
 void driveDisplay();
 void initialise_display();
 void tcaselect(uint8_t i, uint8_t dispnum) ;
+
+uint8_t displayloop = 1;       //variable for current display channel to run       
 
 #endif

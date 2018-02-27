@@ -24,10 +24,17 @@ Hence we will preload the timer with 131 cycles to leave 125 until overflow (1ms
   #include <avr/interrupt.h>
   #include <avr/io.h>
 #endif
+#if defined (CORE_SAMD)
+  #include "avdweb_SAMDtimer.h"
+#endif
   
 #if defined (CORE_TEENSY)
   IntervalTimer lowResTimer;
   void oneMSInterval();
+
+#elif defined (CORE_SAMD)
+void oneMS_ISR (struct tc_module *const module_inst);
+
 #elif defined(CORE_STM32)
   void oneMSInterval();
 #endif  

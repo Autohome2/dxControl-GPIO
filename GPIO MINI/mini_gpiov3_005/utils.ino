@@ -337,6 +337,172 @@ void setPinMapping(byte boardID)
       
       break;
       #endif
+
+      #if defined(TEENSY3_5)
+      case 10:   // TEENSY 3.5 ref board
+      pinOut[1] = 8; //
+      pinOut[2] = 9; //
+      pinOut[3] = 10; //
+      pinOut[4] = 11; //
+      pinOut[5] = 40; //
+      pinOut[6] = 38; //
+      pinOut[7] = 52; //
+      pinOut[8] = 50; //
+      pinOut[9] = 4; //
+      pinOut[10] = 5; //
+      pinOut[11] = 6; //
+      pinOut[12] = 7; //
+      pinOut[13] = 45; //
+      pinOut[14] = 47; //
+      pinOut[15] = 255; //
+      pinOut[16] = 255; //
+
+      pinIn[1] = 12;
+      pinIn[2] = 255;
+      pinIn[3] = 255;
+      pinIn[4] = 255;
+      pinIn[5] = 255;
+      pinIn[6] = 255;
+      pinIn[7] = 255;
+      pinIn[8] = 255;
+      pinIn[9] = 255;
+      pinIn[10] = 255;
+      pinIn[11] = 255;
+      pinIn[12] = 255;
+      pinIn[13] = 255;
+      pinIn[14] = 255;
+      pinIn[15] = 255;
+      pinIn[16] = 255;
+             
+      pinAin[1] = A0;
+      pinAin[2] = A1;
+      pinAin[3] = A2;
+      pinAin[4] = A3;
+      pinAin[5] = A8;
+      pinAin[6] = 255;
+      pinAin[7] = 255;
+      pinAin[8] = 255;
+      pinAin[9] = 255;
+      pinAin[10] = 255;
+      pinAin[11] = 255;
+      pinAin[12] = 255;
+      pinAin[13] = 255;
+      pinAin[14] = 255;
+      pinAin[15] = 255;
+      pinAin[16] = 255;
+      
+      break;
+      #endif
+
+      #if defined(CORE_SAMD)
+      case 20:   // SAMD ref board
+      pinOut[1] = 13; //
+      pinOut[2] = 255; //
+      pinOut[3] = 255; //
+      pinOut[4] = 255; //
+      pinOut[5] = 255; //
+      pinOut[6] = 255; //
+      pinOut[7] = 255; //
+      pinOut[8] = 255; //
+      pinOut[9] = 255; //
+      pinOut[10] = 255; //
+      pinOut[11] = 255; //
+      pinOut[12] = 255; //
+      pinOut[13] = 255; //
+      pinOut[14] = 255; //
+      pinOut[15] = 255; //
+      pinOut[16] = 255; //
+
+      pinIn[1] = 6;
+      pinIn[2] = 7;
+      pinIn[3] = 255;
+      pinIn[4] = 255;
+      pinIn[5] = 255;
+      pinIn[6] = 255;
+      pinIn[7] = 255;
+      pinIn[8] = 255;
+      pinIn[9] = 255;
+      pinIn[10] = 255;
+      pinIn[11] = 255;
+      pinIn[12] = 255;
+      pinIn[13] = 255;
+      pinIn[14] = 255;
+      pinIn[15] = 255;
+      pinIn[16] = 255;
+             
+      pinAin[1] = A0;
+      pinAin[2] = A1;
+      pinAin[3] = A2;
+      pinAin[4] = A3;
+      pinAin[5] = A4;
+      pinAin[6] = A5;
+      pinAin[7] = 255;
+      pinAin[8] = 255;
+      pinAin[9] = 255;
+      pinAin[10] = 255;
+      pinAin[11] = 255;
+      pinAin[12] = 255;
+      pinAin[13] = 255;
+      pinAin[14] = 255;
+      pinAin[15] = 255;
+      pinAin[16] = 255;
+      
+      break;
+      #endif
+
+      default:   // default blank board
+      pinOut[1] = 13; //
+      pinOut[2] = 255; //
+      pinOut[3] = 255; //
+      pinOut[4] = 255; //
+      pinOut[5] = 255; //
+      pinOut[6] = 255; //
+      pinOut[7] = 255; //
+      pinOut[8] = 255; //
+      pinOut[9] = 255; //
+      pinOut[10] = 255; //
+      pinOut[11] = 255; //
+      pinOut[12] = 255; //
+      pinOut[13] = 255; //
+      pinOut[14] = 255; //
+      pinOut[15] = 255; //
+      pinOut[16] = 255; //
+
+      pinIn[1] = 255;
+      pinIn[2] = 255;
+      pinIn[3] = 255;
+      pinIn[4] = 255;
+      pinIn[5] = 255;
+      pinIn[6] = 255;
+      pinIn[7] = 255;
+      pinIn[8] = 255;
+      pinIn[9] = 255;
+      pinIn[10] = 255;
+      pinIn[11] = 255;
+      pinIn[12] = 255;
+      pinIn[13] = 255;
+      pinIn[14] = 255;
+      pinIn[15] = 255;
+      pinIn[16] = 255;
+             
+      pinAin[1] = A0;
+      pinAin[2] = 255;
+      pinAin[3] = 255;
+      pinAin[4] = 255;
+      pinAin[5] = 255;
+      pinAin[6] = 255;
+      pinAin[7] = 255;
+      pinAin[8] = 255;
+      pinAin[9] = 255;
+      pinAin[10] = 255;
+      pinAin[11] = 255;
+      pinAin[12] = 255;
+      pinAin[13] = 255;
+      pinAin[14] = 255;
+      pinAin[15] = 255;
+      pinAin[16] = 255;
+      
+      break;
   }
 
 //setup pin use flags for digouts
@@ -414,37 +580,37 @@ void setPinMapping(byte boardID)
 
   #if defined(MCU_STM32F103C8)
       if (pinAin[1] < 255){ pinMode(pinAin[1], INPUT_ANALOG);}
-      if (pinAin[2] > 255){ pinMode(pinAin[2], INPUT_ANALOG);}
-      if (pinAin[3] > 255){ pinMode(pinAin[3], INPUT_ANALOG);}
-      if (pinAin[4] > 255){ pinMode(pinAin[4], INPUT_ANALOG);}
-      if (pinAin[5] > 255){ pinMode(pinAin[5], INPUT_ANALOG);}
-      if (pinAin[6] > 255){ pinMode(pinAin[6], INPUT_ANALOG);}
-      if (pinAin[7] > 255){ pinMode(pinAin[7], INPUT_ANALOG);}
-      if (pinAin[8] > 255){ pinMode(pinAin[8], INPUT_ANALOG);}
-      if (pinAin[9] > 255){ pinMode(pinAin[9], INPUT_ANALOG);}
-      if (pinAin[10] > 255){ pinMode(pinAin[10], INPUT_ANALOG);}
-      if (pinAin[11] > 255){ pinMode(pinAin[11], INPUT_ANALOG);}
-      if (pinAin[12] > 255){ pinMode(pinAin[12], INPUT_ANALOG);}
-      if (pinAin[13] > 255){ pinMode(pinAin[13], INPUT_ANALOG);}
-      if (pinAin[14] > 255){ pinMode(pinAin[14], INPUT_ANALOG);}
-      if (pinAin[15] > 255){ pinMode(pinAin[15], INPUT_ANALOG);}
-      if (pinAin[16] > 255){ pinMode(pinAin[16], INPUT_ANALOG);}
+      if (pinAin[2] < 255){ pinMode(pinAin[2], INPUT_ANALOG);}
+      if (pinAin[3] < 255){ pinMode(pinAin[3], INPUT_ANALOG);}
+      if (pinAin[4] < 255){ pinMode(pinAin[4], INPUT_ANALOG);}
+      if (pinAin[5] < 255){ pinMode(pinAin[5], INPUT_ANALOG);}
+      if (pinAin[6] < 255){ pinMode(pinAin[6], INPUT_ANALOG);}
+      if (pinAin[7] < 255){ pinMode(pinAin[7], INPUT_ANALOG);}
+      if (pinAin[8] < 255){ pinMode(pinAin[8], INPUT_ANALOG);}
+      if (pinAin[9] < 255){ pinMode(pinAin[9], INPUT_ANALOG);}
+      if (pinAin[10] < 255){ pinMode(pinAin[10], INPUT_ANALOG);}
+      if (pinAin[11] < 255){ pinMode(pinAin[11], INPUT_ANALOG);}
+      if (pinAin[12] < 255){ pinMode(pinAin[12], INPUT_ANALOG);}
+      if (pinAin[13] < 255){ pinMode(pinAin[13], INPUT_ANALOG);}
+      if (pinAin[14] < 255){ pinMode(pinAin[14], INPUT_ANALOG);}
+      if (pinAin[15] < 255){ pinMode(pinAin[15], INPUT_ANALOG);}
+      if (pinAin[16] < 255){ pinMode(pinAin[16], INPUT_ANALOG);}
 #else                        
-      if (pinAin[1] > 255){ pinMode(pinAin[1], INPUT);}
-      if (pinAin[2] > 255){ pinMode(pinAin[2], INPUT);}
-      if (pinAin[3] > 255){ pinMode(pinAin[3], INPUT);}
-      if (pinAin[4] > 255){ pinMode(pinAin[4], INPUT);}
-      if (pinAin[5] > 255){ pinMode(pinAin[5], INPUT);}
-      if (pinAin[6] > 255){ pinMode(pinAin[6], INPUT);}
-      if (pinAin[7] > 255){ pinMode(pinAin[7], INPUT);}
-      if (pinAin[8] > 255){ pinMode(pinAin[8], INPUT);}
-      if (pinAin[9] > 255){ pinMode(pinAin[9], INPUT);}
-      if (pinAin[10] > 255){ pinMode(pinAin[10], INPUT);}
-      if (pinAin[11] > 255){ pinMode(pinAin[11], INPUT);}
-      if (pinAin[12] > 255){ pinMode(pinAin[12], INPUT);}
-      if (pinAin[13] > 255){ pinMode(pinAin[13], INPUT);}
-      if (pinAin[14] > 255){ pinMode(pinAin[14], INPUT);}
-      if (pinAin[15] > 255){ pinMode(pinAin[15], INPUT);}
-      if (pinAin[16] > 255){ pinMode(pinAin[16], INPUT);}
+      if (pinAin[1] < 255){ pinMode(pinAin[1], INPUT);}
+      if (pinAin[2] < 255){ pinMode(pinAin[2], INPUT);}
+      if (pinAin[3] < 255){ pinMode(pinAin[3], INPUT);}
+      if (pinAin[4] < 255){ pinMode(pinAin[4], INPUT);}
+      if (pinAin[5] < 255){ pinMode(pinAin[5], INPUT);}
+      if (pinAin[6] < 255){ pinMode(pinAin[6], INPUT);}
+      if (pinAin[7] < 255){ pinMode(pinAin[7], INPUT);}
+      if (pinAin[8] < 255){ pinMode(pinAin[8], INPUT);}
+      if (pinAin[9] < 255){ pinMode(pinAin[9], INPUT);}
+      if (pinAin[10] < 255){ pinMode(pinAin[10], INPUT);}
+      if (pinAin[11] < 255){ pinMode(pinAin[11], INPUT);}
+      if (pinAin[12] < 255){ pinMode(pinAin[12], INPUT);}
+      if (pinAin[13] < 255){ pinMode(pinAin[13], INPUT);}
+      if (pinAin[14] < 255){ pinMode(pinAin[14], INPUT);}
+      if (pinAin[15] < 255){ pinMode(pinAin[15], INPUT);}
+      if (pinAin[16] < 255){ pinMode(pinAin[16], INPUT);}
 #endif     
 }

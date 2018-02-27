@@ -163,32 +163,32 @@ void direct_serial_command()
     //      }
     //break;      
 
-    //case 'i':                                   //reads a byte using 16bit address only
-    //      {
-    //      uint16_t memaddress = Serial1.parseInt();
-    //      read_byte_address(memaddress);            
-    //      }
-    //break;    
+    case 'i':                                   //reads a byte using 16bit address only
+          {
+          uint16_t memaddress = Serial1.parseInt();
+          read_byte_address(memaddress);            
+          }
+    break;    
 
-    //case 'n':                                 // writes data to location using only 16bit address
-    //      {
-    //      // A two-parameter command..
-    //      //  uint32_t address
-    //      // uint8_t data;
-    //      uint16_t memaddress = Serial1.parseInt();
-    //      uint8_t data = Serial1.parseInt();
-    //      NVMEMwrite(memaddress, data, 0); //write_byte_address(memaddress, data);
-    //      }
-    //break;
+    case 'n':                                 // writes data to location using only 16bit address
+          {
+          // A two-parameter command..
+          //  uint32_t address
+          // uint8_t data;
+          uint16_t memaddress = Serial1.parseInt();
+          uint8_t data = Serial1.parseInt();
+          NVMEMwrite(memaddress, data, 0); //write_byte_address(memaddress, data);
+          }
+    break;
 
-    //case 'o':
-    //      {
-    //      uint16_t memaddress = Serial1.parseInt();            
-    //       uint8_t readback = 0;
-    //       readback = NVMEMread( memaddress);
-    //       Serial1.print(readback);
-    //      }
-    //break;  
+    case 'o':
+          {
+          uint16_t memaddress = Serial1.parseInt();            
+           uint8_t readback = 0;
+           readback = NVMEMread( memaddress);
+           Serial1.print(readback);
+          }
+    break;  
 
     //case 'l':
     //      {

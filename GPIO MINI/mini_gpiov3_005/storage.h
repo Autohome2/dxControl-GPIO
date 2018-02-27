@@ -8,10 +8,17 @@
 //#if defined (MCU_STM32F103C8)
 //  #include "Adafruit_FRAM_SPI.h"
 //#endif
-#if defined (USE_EXT_EEPROM)
+#if USE_EXT_EEPROM == 1
   //#include <SPI.h>
   #include "ext_eeprom.h"
 #endif  
+#if defined (CORE_SAMD)
+   #if USE_EXT_FRAM == 1
+       #include "Adafruit_FRAM_SPI.h"
+   #elif defined (USE_EXT_EEPROM)
+       #include "ext_eeprom.h"
+   #endif  
+#endif
 
 void writeConfig(uint8_t thePage);
 void loadConfig();
