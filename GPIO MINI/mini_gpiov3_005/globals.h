@@ -90,6 +90,8 @@
   #error Specific board not detected. Please select the correct board (Usually Mega 2560) and upload again
     
 #endif
+
+#define NO_TS   1            //set to 1 if you DO NOT WANT to use TS to configure 
  
 #define maincommand  'r'    // the command to send to the Speeduino
 #define commandletterr  'r'
@@ -110,6 +112,7 @@ volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when
 byte zero = 0;
 byte tmp;         //used in assembling incoming serial data ints
 uint16_t theoffset, thelength;  //used with serial data
+#define addressoffset     0x100
 
 //Handy bitsetting macros
 #define BIT_SET(a,b) ((a) |= (1<<(b)))
@@ -123,7 +126,67 @@ uint16_t theoffset, thelength;  //used with serial data
 #define BIT_TIMER_25HZ            4
 #define BIT_TIMER_30HZ            5
 
+//#define BIT_TIMER_1HZ             0
+//#define BIT_TIMER_4HZ             1
+//#define BIT_TIMER_5HZ             2
+//#define BIT_TIMER_10HZ            3
+//#define BIT_TIMER_15HZ            4
+//#define BIT_TIMER_20HZ            5
+//#define BIT_TIMER_25HZ            6
+//#define BIT_TIMER_30HZ            7
+
 #define celBlink_time             4   //4 seconds
+
+//define masks for system status'
+#define BIT_SYSTEM_READY                    0
+#define BIT_SYSTEM_1                        1
+#define BIT_SYSTEM_BURN_GOOD                7
+
+//Define masks for CanStatus
+#define BIT_CANSTATUS_CAN0ACTIVATED         0  //can0 has enabled
+#define BIT_CANSTATUS_CAN0FAILED            1  //can0 failed to configure
+#define BIT_CANSTATUS_CAN1ACTIVATED         2  //can1 has enabled
+#define BIT_CANSTATUS_CAN1FAILED            3  //can1 failed o configure
+#define BIT_CANSTATUS_CAN0MSGFAIL           4 //
+#define BIT_CANSTATUS_CAN1MSGFAIL           5  //
+#define BIT_CANSTATUS_7                     6       //
+#define BIT_CANSTATUS_8                     7  //
+
+// define masks for canModuleConfig;
+#define CAN0ENABLE                          0
+#define CAN1ENABLE                          1
+
+// define maskes for generalConfig1
+#define USE_REALTIME_BROADCAST              0
+//#define unused1_7b                        1
+
+//define masks for canbroadcast_config
+#define GENERIC_BROADCAST                   0       // enable_canbroadcast_out  = bits,   U08,     0, [0:0], "Off", "On"
+#define REMOTE_OUT0_15                      1       // enable_remoteoutput0_15  = bits,   U08,     0, [1:1], "Off", "On"
+#define REMOTE_OUT16_31                     2       // enable_remoteoutput16_31 = bits,   U08,     0, [2:2], "Off", "On"
+#define REMOTE_IN0_15                       3       // enable_remoteinput0_15   = bits,   U08,     0, [3:3], "Off", "On"
+#define REMOTE_IN16_31                      4       // enable_remoteinput16_31  = bits,   U08,     0, [4:4], "Off", "On"
+#define REMOTE_AIN0_15                      5       // enable_remoteAinput0_15 
+
+//define masks for remote output status
+#define REMOTE_OUT_OFF                      0
+#define REMOTE_OUT_ON                       1
+#define REMOTE_OUT_OPENCIRCUIT              2
+#define REMOTE_OUT_SHORTCIRCUIT             3
+#define REMOTE_OUT_THERMALOVERLOAD          4
+#define REMOTE_OUT_CURRENTOVERLOAD          5
+#define REMOTE_OUT_unused6                  6
+#define REMOTE_OUT_unused7                  7
+
+//define masks for remote input status
+#define REMOTE_IN_OFF                      0
+#define REMOTE_IN_ON                       1
+#define REMOTE_IN_OPENCIRCUIT              2
+#define REMOTE_IN_SHORTCIRCUIT             3
+#define REMOTE_IN_THERMALOVERLOAD          4
+#define REMOTE_IN_CURRENTOVERLOAD          5
+#define REMOTE_IN_unused6                  6
+#define REMOTE_IN_unused7                  7
 
 //testIO_hardware bit fields
 #define BIT_STATUS_TESTIO_OUTTESTENABLED       0
@@ -177,8 +240,8 @@ uint16_t master_controller_address;//:11 ;
 uint8_t  pinLayout;
 uint8_t  speeduinoConnection;//:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
 uint16_t speeduinoBaseCan ;//:11;       //speeduino base can address
-uint8_t  unused1_6;
-uint8_t  unused1_7;
+uint8_t canModuleConfig;                //bit flags for canmodule configuration
+uint8_t generalConfig1;
 uint8_t  unused1_8;
 uint8_t  unused1_9;
 uint16_t DoutchanActive;          // digital outputchannels 1-16 active flags
@@ -200,11 +263,11 @@ byte     unused1_93;
 byte     unused1_94;
 byte     unused1_95;
 byte     unused1_96;
-byte unused97;
-byte unused98;
-byte unused99;
-byte unused100;
-byte unused101;
+byte     unused97;
+byte     unused98;
+byte     unused99;
+byte     unused100;
+byte     unused101;
 byte unused102;
 byte unused103;
 byte unused104;
@@ -251,61 +314,14 @@ struct config2 {
   uint16_t   port_Threshold[32];              // threshhold value for on/off
   uint16_t   port_Hysteresis[32];             // hysteresis value for on/off
   uint8_t    port_CanId[32];                  // TScanid of the device the output channel is from  
-//byte unused2_208;
-//byte unused2_209;
-//byte unused2_210;
-//byte unused2_211;
-//byte unused2_212;
-//byte unused2_213;
-//byte unused2_214;
-//byte unused2_215;
-//byte unused2_216;
-//byte unused2_217;
-//byte unused2_218;
-//byte unused2_219;
-//byte unused2_220;
-//byte unused2_221;
-//byte unused2_222;
-//byte unused2_223;
-//byte unused2_224;
-//byte unused2_225;
-//byte unused2_226;
-//byte unused2_227;
-//byte unused2_228;
-//byte unused2_229;
-//byte unused2_230;
-//byte unused2_231;
-//byte unused2_232;
-//byte unused2_233;
-//byte unused2_234;
-//byte unused2_235;
-//byte unused2_236;
-//byte unused2_237;
-//byte unused2_238;
-//byte unused2_239;
-//byte unused2_240;
-//byte unused2_241;
-//byte unused2_242;
-//byte unused2_243;
-//byte unused2_244;
-//byte unused2_245;
-//byte unused2_246;
-//byte unused2_247;
-//byte unused2_248;
-//byte unused2_249;
-//byte unused2_250;
-//byte unused2_251;
-//byte unused2_252;
-//byte unused2_253; 
-//byte unused2_254;
-//byte unused2_255; 
+
 #if defined(CORE_AVR)
   };
 #else
   } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
 #endif
 
-//Page 3 of the config - See the ini file for further reference
+//Page 3 of the config - This page is NOT SAVED IN NV MEMORY(EEPROM etc)
 //this is laid out as first the byte size data then the words
 
 struct config3 {
@@ -314,19 +330,19 @@ struct config3 {
 #if defined(CORE_AVR)
   };
 #else
-  } __attribute__((__packed__)); //The 32 bi systems require all structs to be fully packed
+  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
 #endif
 
  //declare io pins
-byte pinOut[17]; //digital outputs array is +1 as pins start at 1 not 0
+byte pinOut[33]; //digital outputs array is +1 as pins start at 1 not 0
 
-byte pinIn[17];  //digital inputs
+byte pinIn[33];  //digital inputs
 
 byte pinAin[17]; //analog inputs
 
 
-// global variables // from passthrough_example.ino
-extern struct statuses currentStatus; // from passthrough.ino
+// global variables // 
+extern struct statuses currentStatus; // 
 extern struct config1 configPage1;  
 extern struct config2 configPage2;
 extern struct config3 configPage3;

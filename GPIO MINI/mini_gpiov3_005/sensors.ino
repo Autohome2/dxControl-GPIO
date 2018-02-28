@@ -19,14 +19,18 @@ void initialiseADC()
 void readAnalog(uint8_t AinCH)
 {
     tempReading = analogRead( pinAin[AinCH]);   //read the adc channel
-       #if defined(ARDUINO_AVR_MEGA2560)
+//       #if defined(ARDUINO_AVR_MEGA2560)
     tempReading = analogRead( pinAin[AinCH]);   //read it a second time to get a more stable /faster read
-    #endif
+//    #endif
     
     #if defined(MCU_STM32F103C8)
     tempReading >>= 2;  //rescales to max 1024 value else would be 0-4096
     #endif
-    currentStatus.Analog[(AinCH-1)] = tempReading;
+    
+    if(!BIT_CHECK(currentStatus.aintestsent, (AinCH-1)))         // if the current analog channel is forced by test dont update
+      {
+       currentStatus.Analog[(AinCH-1)] = tempReading;
+      }
     
 }
 

@@ -21,7 +21,8 @@ A full copy of the license may be found in the speeduino projects root directory
 #include "timers.h"
 #include "remotecomms.h"
 #include "display.h"
-
+#include "sysconfig.h"
+  
 #if defined (CORE_AVR) 
   #include <EEPROM.h>
 #endif
@@ -209,9 +210,15 @@ void setup() {
             init_sam_ext_eeprom(1);
       #endif
   #endif
+
+   #if NO_TS == 0
+      loadConfig();         //run this is TS is in use
+  #elif NO_TS == 1
+      noTsConfig();         // but this if TS is not to be used
+  #endif
   
- loadConfig();
  setPinMapping(configPage1.pinLayout);
+ setusageflags();
  initialiseADC();
  initialiseTimers();
  initialise_display();
@@ -251,7 +258,7 @@ void loop()
           else displayloop = 1;           
         }
           
-      if (SERIALLink.available() > 32) 
+      if (SERIALLink.available() > 32)        // if there is more than 32 bytes in the buffer then read it now
         {
          if (SERIALLink.available() > 0)      // if SERIALLink has data then do the remote serial command subroutine
            {
@@ -299,10 +306,9 @@ void loop()
 
          for (byte Achan = 1; Achan <17 ; Achan++)
             {
-             if(!BIT_CHECK(currentStatus.aintestsent, (Achan-1)))         //
-                    { 
+ 
                       if (pinAin[Achan] < 255) {readAnalog(Achan);}        // if analog pin is in use read the analog inputs
-                    }  
+//                    }  
             }
             
          if (!BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_OUTTESTACTIVE))                  // if NOT in hardware test mode then read the digital inputs

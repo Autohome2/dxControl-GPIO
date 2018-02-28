@@ -95,17 +95,18 @@ void direct_serial_command()
 
           case 'W': // receive new VE obr constant at 'W'+<offset>+<newbyte>
                   //A 2nd byte of data is required after the 'P' specifying the new page number.
-                  if (CONSOLE_SERIALLink.available() >= 4)
-                    {
-                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                  //if (CONSOLE_SERIALLink.available() >= 4)
+                  //  {
+                     while (CONSOLE_SERIALLink.available() == 0) {}
                      currentStatus.currentPage = CONSOLE_SERIALLink.read();
-                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                     while (CONSOLE_SERIALLink.available() == 0) {}
                      tmp = CONSOLE_SERIALLink.read();
-                     //while (CONSOLE_SERIALLink.available() == 0) {}
+                     while (CONSOLE_SERIALLink.available() == 0) {}
                      theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;                     
-                     //while (CONSOLE_SERIALLink.available() == 0) {}
-                     direct_receiveValue(theoffset, CONSOLE_SERIALLink.read());
-                    }
+                     while (CONSOLE_SERIALLink.available() == 0) {}
+                     tmp = CONSOLE_SERIALLink.read();
+                     direct_receiveValue(theoffset, tmp);
+                  //  }
           break;
      
           case 'r': 
@@ -120,7 +121,7 @@ void direct_serial_command()
                   while (CONSOLE_SERIALLink.available() == 0) {}
                   theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;                  
                   while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
+                  tmp = CONSOLE_SERIALLink.read();
                 
                 if (cmd != 87)          //if is "W" only 1 more byte is sent
                  {
@@ -589,7 +590,8 @@ void commandButtons(uint16_t cmdCombined, uint16_t cmdData)
                   if(BIT_CHECK(currentStatus.testIO_hardware, BIT_STATUS_TESTIO_AINTESTACTIVE))         //if the ain tests are enabled
                     {
                      currentStatus.Analog[(cmdCombined-1537)] = (configPage3.aintestData[(cmdCombined-1537)])<<2;
-                     //currentStatus.dev1 = configPage3.aintestData[(cmdCombined-1537)];
+                     currentStatus.dev1 = configPage3.aintestData[(cmdCombined-1537)];
+                     currentStatus.dev2 = configPage3.aintestData[0];
                      BIT_SET(currentStatus.aintestsent, (cmdCombined-1537));  //set aintestenabled flag     
                      //BIT_CLEAR(currentStatus.digOut, (cmdCombined-1537));
                     }
