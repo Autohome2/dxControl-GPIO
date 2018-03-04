@@ -91,14 +91,14 @@
     
 #endif
 
-#define NO_TS   1            //set to 1 if you DO NOT WANT to use TS to configure 
+#define NO_TS   0            //set to 1 if you DO NOT WANT to use TS to configure 
  
 #define maincommand  'r'    // the command to send to the Speeduino
 #define commandletterr  'r'
 uint8_t tsCanId = 0;          // this is the tunerstudio canID for the device you are requesting data from , this is 0 for the main ecu in the system which is usually the speeduino ecu .                               
 
-const unsigned char simple_remote_signature[]    = "speeduino_mini_GPIOV3.005 201802"; //this must match the ini
-const unsigned char simple_remote_RevNum[] = "speeduino 201802-mini GPIO V3.005";      //this is what is displayed in the TS header bar
+const unsigned char GPIO_signature[]    = "speeduino_mGPIOV3005"; //this must match the ini
+const unsigned char GPIO_RevNum[] = "speeduino 201802-mini GPIO V3.005";      //this is what is displayed in the TS header bar
 uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
 
 const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.

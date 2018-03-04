@@ -65,16 +65,16 @@ void direct_serial_command()
           break;
       
           case 'Q': // send code version
-                  for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
+                  for (unsigned int sg = 0; sg < sizeof(GPIO_signature) - 1; sg++)
                      {
-                      CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
+                      CONSOLE_SERIALLink.write(GPIO_signature[sg]);  
                      }
           break;
           
           case 'S': // send code version
-                  for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                  for (unsigned int sg = 0; sg < sizeof(GPIO_RevNum) - 1; sg++)
                      {
-                      CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
+                      CONSOLE_SERIALLink.write(GPIO_RevNum[sg]);
                       currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
                      }
           break;
@@ -164,33 +164,33 @@ void direct_serial_command()
     //      }
     //break;      
 
-    case 'i':                                   //reads a byte using 16bit address only
-          {
-          uint16_t memaddress = Serial1.parseInt();
-          read_byte_address(memaddress);            
-          }
-    break;    
+//    case 'i':                                   //reads a byte using 16bit address only
+//          {
+//          uint16_t memaddress = Serial1.parseInt();
+//          read_byte_address(memaddress);            
+//          }
+//    break;    
 
-    case 'n':                                 // writes data to location using only 16bit address
-          {
-          // A two-parameter command..
-          //  uint32_t address
-          // uint8_t data;
-          uint16_t memaddress = Serial1.parseInt();
-          uint8_t data = Serial1.parseInt();
-          NVMEMwrite(memaddress, data, 0); //write_byte_address(memaddress, data);
-          }
-    break;
+//    case 'n':                                 // writes data to location using only 16bit address
+//          {
+//          // A two-parameter command..
+//          //  uint32_t address
+//          // uint8_t data;
+//          uint16_t memaddress = Serial1.parseInt();
+//          uint8_t data = Serial1.parseInt();
+//          NVMEMwrite(memaddress, data, 0); //write_byte_address(memaddress, data);
+//          }
+//    break;
 
-    case 'o':
-          {
-          uint16_t memaddress = Serial1.parseInt();            
-           uint8_t readback = 0;
-           readback = NVMEMread( memaddress);
-           Serial1.print(readback);
-          }
-    break;  
-
+//    case 'o':
+//          {
+//          uint16_t memaddress = Serial1.parseInt();            
+//           uint8_t readback = 0;
+//           readback = NVMEMread( memaddress);
+//           Serial1.print(readback);
+//          }
+//    break;  
+//
     //case 'l':
     //      {
     //        uint16_t memaddress = Serial1.parseInt(); 
@@ -222,16 +222,16 @@ void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset,
     switch (commandletter)
           {
            case 15:    //
-                   for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
+                   for (unsigned int sg = 0; sg < thelength; sg++)
                       {
-                       CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
+                       CONSOLE_SERIALLink.write(GPIO_signature[sg]);  
                       }  
            break;
                         
            case 14:  //
-                   for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                   for (unsigned int sg = 0; sg < sizeof(GPIO_RevNum) - 1; sg++)
                       {
-                       CONSOLE_SERIALLink.write(simple_remote_RevNum[sg]);
+                       CONSOLE_SERIALLink.write(GPIO_RevNum[sg]);
                        currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
                       }     
            break;
