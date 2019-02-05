@@ -8,13 +8,16 @@ A full copy of the license may be found in the projects root directory
 Based on code by Josh Stewart for the Speeduino project , see www.Speeduino.com for more info
 */
 
+#include "globals.h"
+#include "directcomms.h"
+#include "remotecomms.h"
+#include "storage.h"
+#include "utils.h"
+
 /*
 This is called when a command is received over seriallink from external source
 It parses the command and calls the relevant function
 */
-#include "remotecomms.h"
-#include "globals.h"
-
 void remote_serial_command()
 {
 

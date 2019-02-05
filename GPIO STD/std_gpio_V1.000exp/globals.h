@@ -2,8 +2,7 @@
 #define GLOBALS_H
 #include <Arduino.h>
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
-  #define BOARD_NR_GPIO_PINS 54
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)|| defined (ARDUINO_AVR_ATmega324)
   #define LED_BUILTIN 13
   #define CORE_AVR
   #define USE_INT_EEPROM
@@ -13,19 +12,35 @@
   
 #elif defined(STM32_MCU_SERIES) || defined(_VARIANT_ARDUINO_STM32_)
       #define CORE_STM32
-      #define LED_BUILTIN PC13
+   //   #define LED_BUILTIN PC13
       //only choose one of the following two defines , comment out the unused ones
    // #define USE_EXT_FLASH
-      #define USE_EXT_EEPROM
+   //   #define USE_EXT_EEPROM
   //  #define USE_EXT_FRAM
   
-      #define EXT_FLASH_SIZE 8192
-      #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
+  //    #define EXT_FLASH_SIZE 8192
+  //    #define FLASH_OFFSET  EXT_FLASH_SIZE / 2
 
       extern "C" char* sbrk(int incr); //Used by freeRam
       inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
       #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
       #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
+
+//#elif defined  (ARDUINO_SAMD_ZERO)
+    #define CORE_SAMD
+    //__SAMD21E18A__
+    // using a 32 pin SAMD
+    
+    //__SAMD21G18A__
+    // using a 48pin SAMD
+
+    //__SAMD21J18A__
+    // using a 64pin SAMD
+
+    //__SAMD21N18A__
+    // using a 100pin SAMD
+    extern "C" char* sbrk(int incr);
+
 #else
   #error Incorrect board selected. Please select the correct board (Usually Mega 2560) and upload again
 #endif  
@@ -33,18 +48,26 @@
 // now set specific processor compile flags
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
   #define MEGA_AVR
+  #define BOARD_NR_GPIO_PINS 54
 
-#elif defined(ARDUINO_AVR_PRO)
-  #define 328_AVR
+//#elif defined(ARDUINO_AVR_ATmega324)
+//  #define AVR_324
+//  #define BOARD_NR_GPIO_PINS 44
+//  #define SMALL_AVR
+    
+//#elif defined(ARDUINO_AVR_PRO)
+//  #define 328_AVR
+//  #define SMALL_AVR
 
-#elif defined(ARDUINO_Nucleo_64)
-  #define NUCLEO_64_STM32
+//#elif defined(ARDUINO_Nucleo_64)
+//  #define NUCLEO_64_STM32
 
-#elif defined(MCU_STM32F103C8)
-  #define F108C8_STM32
+//#elif defined(MCU_STM32F103C8)
+//  #define F108C8_STM32
+//  #define SMALL_STM32
 
-#elif defined(MCU_STM32F407VGT6)
-  #define F407_STM32  
+//#elif defined(MCU_STM32F407VGT6)
+//  #define F407_STM32  
 
 #endif
 
@@ -106,14 +129,14 @@ uint8_t tsCanId = 0;          // this is the tunerstudio canID for the device yo
                               // this value is set in Tunerstudio when configuring your Speeduino
 uint8_t thistsCanId = 4;      // this is the tunerstudio canId of this device
 
-const unsigned char GPIO_signature[]    = "speeduino_mini_GPIOV3.003 201711";       //this must match the ini
-const unsigned char GPIO_RevNum[]       = "speeduino 201711-mini GPIO V3.003";      //this is what is displayed in the TS header bar
+const unsigned char GPIO_signature[]    = "speeduino_GPIO0219";       //this must match the ini
+const unsigned char GPIO_RevNum[]       = "speeduino 201902-std GPIO V1.000";      //this is what is displayed in the TS header bar
 
-const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
-const uint8_t page_1_size = 128;
+const uint8_t  data_structure_version = 2; //This identifies the data structure when reading / writing.
+const uint8_t  page_1_size = 128;
 const uint16_t page_2_size = 704;
 const uint16_t page_3_size = 256;
-const uint16_t page_4_size = 334;
+const uint16_t page_4_size = 336;
 
 volatile uint8_t swap_page = 0; // current external flash swap page number
 volatile bool swap_next_page = 0; // 0 == dont swap pages , 1 == swap pages when all written
@@ -179,12 +202,12 @@ struct statuses {
   volatile uint16_t dev3;          //developer use only
   volatile uint16_t dev4;          //developer use only
 };
-//struct statuses currentStatus; //The global status object
+struct statuses currentStatus; //The global status object
 
 //Page 1 of the config - See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
-struct config1 {
+struct __attribute__ ( ( packed ) ) config1 {   //struct config1 {
 uint16_t master_controller_address:11 ;
 uint8_t pinLayout;
 uint8_t speeduinoConnection ;//:2;       //type of connection to speedy , 0==none 1 == serial3 2 == canbus
@@ -243,18 +266,18 @@ byte unused124;
 byte unused125;
 byte unused126 = 226;
 byte unused127 = 227;
-#if defined(CORE_AVR)
+//#if defined(CORE_AVR)
   };
-#else
-  } __attribute__((__packed__)); //The 32 bi systems require all structs to be fully packed
-#endif
+//#else
+//  } __attribute__((__packed__)); //The 32 bi systems require all structs to be fully packed
+//#endif
 
 //};
 
 //Page 2 of the config - See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
-struct config2 {
+struct __attribute__ ( ( packed ) ) config2 {    //struct config2 {
   uint8_t    port_Enabled[16];                // 1 if enabled 0 if not
   uint8_t    port_Condition[32];              // < is 60, = is 61, > is 62, & is 38
   uint8_t    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
@@ -278,65 +301,18 @@ struct config2 {
   uint16_t   port_Threshold_2[32];              // threshhold value for on/off
   uint16_t   port_Hysteresis_2[32];             // hysteresis value for on/off
   uint8_t    port_CanId_2[32];                  // TScanid of the device the output channel is from 
-//byte unused2_208;
-//byte unused2_209;
-//byte unused2_210;
-//b/yte unused2_211;
-//byte unused2_212;
-//byte unused2_213;
-//byte unused2_214;
-//byte unused2_215;
-//byte unused2_216;
-//byte unused2_217;
-//byte unused2_218;
-//byte unused2_219;
-//byte unused2_220;
-//byte unused2_221;
-//byte unused2_222;
-//byte unused2_223;
-//byte unused2_224;
-//byte unused2_225;
-//byte unused2_226;
-//byte unused2_227;
-//byte unused2_228;
-//byte unused2_229;
-//byte unused2_230;
-//byte unused2_231;
-//byte unused2_232;
-//byte unused2_233;
-//byte unused2_234;
-//byte unused2_235;
-//byte unused2_236;
-//byte unused2_237;
-//byte unused2_238;
-//byte unused2_239;
-///byte unused2_240;
-//byte unused2_241;
-//byte unused2_242;
-//by//te unused2_243;
-//byte unused2_244;
-//byte unused2_245;
-//byte unused2_246;
-//byte unused2_247;
-//byte unused2_248;
-//byte unused2_249;
-//byte unused2_250;
-//byte unused2_251;
-//byte unused2_252;
-//byte unused2_253; 
-//byte unused2_254;
-//byte unused2_255; 
-#if defined(CORE_AVR)
+
+//#if defined(CORE_AVR)
   };
-#else
-  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
-#endif
+//#else
+//  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+//#endif
 //};
 
 //Page 3 of the config -canbus broadcast,obd and config- See the ini file for further reference
 //this is laid out as first the byte size data then the words
 
-struct config3 {
+struct __attribute__ ( ( packed ) ) config3 {    //struct config3 {
 uint8_t canbroadcast_config;  
 uint16_t canbroadcast_sel;
 uint16_t canbroadcast_source_can_address[16];
@@ -486,88 +462,39 @@ byte unused3_253;
 byte unused3_254;
 byte unused3_255; 
 
-#if defined(CORE_AVR)
+//#if defined(CORE_AVR)
   };
-#else
-  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
-#endif
+//#else
+//  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+//#endif
 
 //Page 4 of the config - See the ini file for further reference
 
-struct config4 {      //; Canbus remote input and outputs
-uint16_t remoteoutput_sel_0_16;
-uint16_t remoteoutput_sel_17_31;
-uint16_t remoteoutput_can_address[32];
-uint8_t  remoteoutput_port[32];
-uint16_t remoteoutput_statusEnable_0_16;
-uint16_t remoteoutput_statusEnable_17_31;
-uint8_t  remoteoutput_freq[32];
-uint16_t remoteinput_sel_0_16;
-uint16_t remoteinput_sel_17_31;
-uint16_t remoteinput_can_address[32];
-uint8_t  remoteinput_port[32];
-uint8_t  remoteinput_freq[32];  
-uint16_t remoteAninput_sel;
-uint16_t remoteAninput_can_address[16];
-uint8_t  remoteAninput_port[16];
-uint8_t  remoteAninput_freq[16];
+struct __attribute__ ( ( packed ) ) config4 {    //struct config4 {      //; Canbus remote input and outputs
+uint16_t remoteoutput_sel_0_16 ;                             //0-1
+uint16_t remoteoutput_sel_17_31 ;                            //2-3
+uint16_t remoteoutput_can_address[32] ;                      //4-67
+uint8_t  remoteoutput_port[32] ;                             //68-99
+uint16_t remoteoutput_statusEnable_0_16 ;                    //100-101
+uint16_t remoteoutput_statusEnable_17_31 ;                   //102-103
+uint8_t  remoteoutput_freq[32] ;                             //104-135
+uint16_t remoteinput_sel_0_16 ;                              //136-137
+uint16_t remoteinput_sel_17_31 ;                             //138-139
+uint16_t remoteinput_can_address[32] ;                       //139-203
+uint8_t  remoteinput_port[32] ;                              //204-235
+uint8_t  remoteinput_freq[32] ;                              //236-267
+uint16_t remoteAninput_sel ;                                 //268-269
+uint16_t remoteAninput_can_address[16] ;                     //270-301  
+uint8_t  remoteAninput_port[16] ;                            //302-317
+uint8_t  remoteAninput_freq[16] ;                            //318-333
+byte unused4_334;                                            //334 
+byte unused4_335;                                            //335
 
-//byte unused4_200;
-//byte unused4_201;/
-//byte unused4_202;
-//byte unused4_203;
-//byte unused4_204;
-//byte unused4_205;
-//byte unused4_206;
-//byte unused4_207;
-//byte unused4_208;
-//byte unused4_209;
-//byte unused4_210;
-//byte unused4_211;
-//byte unused4_212;
-//byte unused4_213;
-//byte unused4_214;
-//byte unused4_215;
-//byte unused4_216;
-//byte unused4_217;
-//byte unused4_218;
-//byte unused4_219;
-//byte unused4_220;
-//byte unused4_221;
-//byte unused4_222;
-//byte unused4_223;
-//byte unused4_224;
-//byte unused4_225;
-//byte unused4_226;
-//byte unused4_297;
-//byte unused4_298;
-//byte unused4_299;
-//byte unused4_300;
-//byte unused4_301;
-//byte unused4_302;
-//byte unused4_303;
-//byte unused4_304;
-//byte unused4_305;
-//byte unused4_306;
-//byte unused4_307;
-//byte unused4_308;
-//byte unused4_309;
-//byte unused4_310;
-//byte unused4_311;
-//byte unused4_312;
-//byte unused4_313;
-//byte unused4_314;
-//byte unused4_315;/
-//b/yte unused4_316;
-//byte unused4_317;
-//byte unused4_318;
-//byte unused4_319;
-
-#if defined(CORE_AVR)
+//#if defined(CORE_AVR)
   };
-#else
-  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
-#endif
+//#else
+//  } __attribute__((__packed__)); //The 32 bit systems require all structs to be fully packed
+//#endif
 
   
  //declare io pins

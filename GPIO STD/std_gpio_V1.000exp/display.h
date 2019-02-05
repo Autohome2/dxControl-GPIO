@@ -6,7 +6,7 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //display module options .  
 //setup display 1
-#define DISP1_ACTIVE     1             // 0 == DISABLED , 1 == ENABLED
+#define DISP1_ACTIVE     0             // 0 == DISABLED , 1 == ENABLED
 #define DISP1_SPI_I2C    1             // 0 == SPI , 1 == I2C
 
 //if I2C set these next three values
@@ -15,11 +15,8 @@
 #define DISP1_ROUTE_OUT  0             // the output port on the tca9548 screen is connected to if mux in use
 
 //only choose one of the following defines for display type selection  , comment out the unused ones
-#define DISP1_USE_SSD1106_I2C
-//#define DISP1_USE_SSD1306_I2C
-//#define DISP1_USE_SSD1106_SPI
+#define DISP1_USE_SSD1106_SPI
 //#define DISP1_USE_SSH1106_SPI
-//#define DISP1_USE_4x20_I2C_EXP
 
 //set pins for screens in spi mode
 //display 1
@@ -39,11 +36,8 @@
 #define DISP2_ROUTE_OUT  1             // the output port on the tca9548 screen is connected to if mux in use
 
 //only choose one of the following defines for display type selection  , comment out the unused ones
-#define DISP2_USE_SSD1106_I2C
-//#define DISP2_USE_SSD1306_I2C
-//#define DISP2_USE_SSD1106_SPI
+#define DISP2_USE_SSD1106_SPI
 //#define DISP2_USE_SSH1106_SPI
-//#define DISP2_USE_4x20_I2C_EXP
 
 //set pins for screens in spi mode
 //display 2

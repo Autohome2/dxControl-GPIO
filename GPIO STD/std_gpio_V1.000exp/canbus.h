@@ -4,7 +4,7 @@
 /*--------------- canbus config options -------------- */
 /* CAN 0 */
 #define CAN0_ACTIVE     0         // 0 == DISABLED , 1 == ENABLED
-#define CAN0_RATE       500       // eg 500 == 500kbps
+#define CAN0_RATE       250       // eg 500 == 500kbps
 #define CAN0_STD_EXT    0         // 0 == STD 11bit , 1 == EXT 29bit
 #define CAN0_INT        2         // Set INT to pin 2
 #define CAN0_CS         11        // Set CS to pin 11

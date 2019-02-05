@@ -8,15 +8,16 @@ A full copy of the license may be found in the projects root directory
 Based on code by Josh Stewart for the Speeduino project , see www.Speeduino.com for more info
 */
 
+#include "globals.h"
+#include "directcomms.h"
+#include "remotecomms.h"
+#include "storage.h"
+#include "utils.h"
+
 /*
 This is called when a command is received over serial from TunerStudio
 It parses the command and calls the relevant function
 */
-#include "directcomms.h"
-#include "globals.h"
-//#include "storage.h"
-
-
 void direct_serial_command()
 {
     switch (CONSOLE_SERIALLink.read())
@@ -62,11 +63,11 @@ void direct_serial_command()
           break;
       
           case 'Q': // send code version
-                CONSOLE_SERIALLink.print("speeduino mini_GPIOV3.003 201711");
-                   // for (unsigned int sg = 0; sg < sizeof(GPIO_signature) - 1; sg++)
-                   //     {
-                   //     CONSOLE_SERIALLink.write(GPIO_signature[sg]);  
-                   //     }
+               // CONSOLE_SERIALLink.print("speeduino mini_GPIOV3.003 201711");
+                    for (unsigned int sg = 0; sg < sizeof(GPIO_signature) - 1; sg++)
+                        {
+                        CONSOLE_SERIALLink.write(GPIO_signature[sg]);  
+                        }
           break;
           
           case 'S': // send code version
@@ -91,21 +92,23 @@ void direct_serial_command()
                 direct_sendPage(theoffset,thelength,thistsCanId,0);
           break;
 
-          case 'W': // receive new VE obr constant at 'W'+<offset>+<newbyte>
+          case 'W': // receive new data value at 'W'+<offset>+<newbyte>
                 //A 2nd byte of data is required after the 'P' specifying the new page number.
-                if (CONSOLE_SERIALLink.available() >= 4)
-      {
-                //while (CONSOLE_SERIALLink.available() == 0) {}
-                currentStatus.currentPage = CONSOLE_SERIALLink.read();
-                //while (CONSOLE_SERIALLink.available() == 0) {}
+                //if (CONSOLE_SERIALLink.available() >= 3)
+                //  {
+                    //while (CONSOLE_SERIALLink.available() == 0) {}
+              //      currentStatus.currentPage = CONSOLE_SERIALLink.read();
+                while (CONSOLE_SERIALLink.available() == 0) {}
                 tmp = CONSOLE_SERIALLink.read();
-                //while (CONSOLE_SERIALLink.available() == 0) {}
+                while (CONSOLE_SERIALLink.available() == 0) {}
                 theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
-                //theoffset = word(CONSOLE_SERIALLink.read(), tmp);
-                //while (CONSOLE_SERIALLink.available() == 0) {}
-                direct_receiveValue(theoffset, CONSOLE_SERIALLink.read());
-      }
+                         //theoffset = word(CONSOLE_SERIALLink.read(), tmp);  this was replaced with the line above as not all cores supported the word option
+                while (CONSOLE_SERIALLink.available() == 0) {}
+                tmp = CONSOLE_SERIALLink.read();
+                direct_receiveValue(theoffset, tmp);                      // 
+                  
           break;
+
      
           case 'r': 
                 byte cmd;
@@ -114,22 +117,31 @@ void direct_serial_command()
                 tsCanId_sent = CONSOLE_SERIALLink.read(); //Read the $tsCanId
                 while (CONSOLE_SERIALLink.available() == 0) {}
                 cmd = CONSOLE_SERIALLink.read();
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                theoffset = (CONSOLE_SERIALLink.read()<<8) | tmp;
-               // theoffset = word(CONSOLE_SERIALLink.read(), tmp);
-                while (CONSOLE_SERIALLink.available() == 0) {}
-                tmp = CONSOLE_SERIALLink.read();
-                
-                if (cmd != 87)          //if is "W" only 1 more byte is sent
-                  {
-                   while (CONSOLE_SERIALLink.available() == 0) {}
-                   thelength = (CONSOLE_SERIALLink.read()<<8) | tmp;
-                   // thelength = word(CONSOLE_SERIALLink.read(), tmp); 
-                  }
-                else{thelength = tmp;}
+                      while (CONSOLE_SERIALLink.available() == 0) {}
+                      tmp = CONSOLE_SERIALLink.read();
+                      while (CONSOLE_SERIALLink.available() == 0) {}
+                      theoffset = word(CONSOLE_SERIALLink.read(), tmp);
+                      while (CONSOLE_SERIALLink.available() == 0) {}
+                      tmp = CONSOLE_SERIALLink.read();
+                      if (cmd != 87)          //if is "W" only 1 more byte is sent
+                       {
+                        while (CONSOLE_SERIALLink.available() == 0) {}
+                          if ((cmd == 0x0f) || (cmd == 0x0e))          //if cmd is 14 or 15
+                            { 
+                             thelength = word(tmp, CONSOLE_SERIALLink.read());     //for some strange reason TS sends the canid check hard coded as big endian! 
+                            } 
+                            
+                          else
+                            {
+                             thelength = word(CONSOLE_SERIALLink.read(), tmp);
+                            }
+                        
+                       }
+                      else{thelength = tmp;}
 
+           //   currentStatus.dev1 = theoffset;
+           //   currentStatus.dev2 = thelength;
+          
              if (tsCanId_sent ==  thistsCanId)        //was the canid sent by TS the same as this device TScanID?
                {
                 dolocal_rCommands(cmd,tsCanId_sent,theoffset,thelength);
@@ -151,84 +163,27 @@ void direct_serial_command()
                    // speeduino not connected so ignore 
                   }
                             
-               }
-            
+               }            
           break;
-//these next cases are for dev use only
-    //case 'm':                                   //reads multiple bytes using start address and length
-    //      {  
-    //      uint16_t memaddress = Serial1.parseInt();
-    //      uint16_t leng = Serial1.parseInt();
-    //      read_bytes_address(memaddress,leng);                       
-    //      }
-    //break;      
-
-    //case 'i':                                   //reads a byte using 16bit address only
-    //      {
-    //      uint16_t memaddress = Serial1.parseInt();
-    //      read_byte_address(memaddress);            
-    //      }
-    //break;    
-
-    //case 'n':                                 // writes data to location using only 16bit address
-    //      {
-    //      // A two-parameter command..
-    //      //  uint32_t address
-    //      // uint8_t data;
-    //      uint16_t memaddress = Serial1.parseInt();
-    //      uint8_t data = Serial1.parseInt();
-    //      NVMEMwrite(memaddress, data, 0); //write_byte_address(memaddress, data);
-    //      }
-    //break;
-
-    //case 'o':
-    //      {
-    //      uint16_t memaddress = Serial1.parseInt();            
-    //       uint8_t readback = 0;
-    //       readback = NVMEMread( memaddress);
-    //       Serial1.print(readback);
-    //      }
-    //break;  
-
-    //case 'l':
-    //      {
-    //        uint16_t memaddress = Serial1.parseInt(); 
-    //        void* pnt_stm32_configPage;//This only stores the address of the value that it's pointing to and not the max size
-    //        pnt_stm32_configPage = (uint16_t *)&configPage2; //Create a pointer to Page 1 in memory
-    //        uint8_t test;
-    //        test = *((uint16_t *)pnt_stm32_configPage + (uint16_t)(memaddress));
-    //        Serial1.print(test);
-    //      }
-
-    //case 'k':
-    //      {
-    //        uint16_t memaddress = Serial1.parseInt();
-    //        uint8_t data = Serial1.parseInt();
-    //          uint16_t* pnt_stm32_configPage;
-    //        //pnt_stm32_configPage = (uint16_t *)&configPage1; //Create a pointer to Page 1 in memory       
-    //        pnt_stm32_configPage = (uint16_t *)&configPage2; //Create a pointer to Page 2 in memory
-    //        *((uint16_t *)pnt_stm32_configPage + (uint16_t)(memaddress)) = (uint8_t)data;
-    //      }
     
     }
-
-return;
+//return;
  
 }
+
 void dolocal_rCommands(uint8_t commandletter, uint8_t canid, uint16_t theoffset, uint16_t thelength)
 {
   
     switch (commandletter)
            {
-           case 15:    //
-                    CONSOLE_SERIALLink.print("speeduino mini_GPIOV3.003 201711");
-                    //for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                    //    {
-                    //    CONSOLE_SERIALLink.write(simple_remote_signature[sg]);  
-                    //    }  
+           case 15:    //  0x0f 
+                    for (unsigned int sg = 0; sg < sizeof(GPIO_signature) - 1; sg++)
+                        {
+                        CONSOLE_SERIALLink.write(GPIO_signature[sg]);  
+                        }
            break;
                         
-           case 14:  //
+           case 14:  //   0x0e
                     for (unsigned int sg = 0; sg < sizeof(GPIO_RevNum) - 1; sg++)
                         {
                         CONSOLE_SERIALLink.write(GPIO_RevNum[sg]);
@@ -282,7 +237,8 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
 
     case 1: //simple_remote_setupPage:
       pnt_configPage = &configPage1; //Setup a pointer to the relevant config page
-     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, 
+     //but the fix is to only update the config page if the offset is less than the maximum size
       if ( rvOffset < page_1_size)
       {
         *((uint8_t *)pnt_configPage + (uint8_t)rvOffset) = newValue; //
@@ -291,7 +247,8 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
 
     case 2: //port editor config Page:
       pnt_configPage = &configPage2; //Setup a pointer to the relevant config page
-     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, 
+     //but the fix is to only update the config page if the offset is less than the maximum size
       if ( rvOffset < page_2_size)
       {
         *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
@@ -300,7 +257,8 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
 
     case 3: //canbus config Page:
       pnt_configPage = &configPage3; //Setup a pointer to the relevant config page
-     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine,
+     //but the fix is to only update the config page if the offset is less than the maximum size
       if ( rvOffset < page_3_size)
       {
         *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
@@ -309,7 +267,8 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
       
     case 4: //canbus remote io config Page:
       pnt_configPage = &configPage4; //Setup a pointer to the relevant config page
-     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
+     //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine,
+     //but the fix is to only update the config page if the offset is less than the maximum size
       if ( rvOffset < page_4_size)
       {
         *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
@@ -322,7 +281,7 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
 /*
 sendPage() packs the data within the current page (As set with the 'P' command)
 into a buffer and sends it.
-Note that some translation of the data is required to lay it out in the way Megasqurit / TunerStudio expect it
+Note that some translation of the data is required to lay it out in the way TunerStudio expect it
 useChar - If true, all values are send as chars, this is for the serial command line interface. TunerStudio expects data as raw values, so this must be set false in that case
 */
 void direct_sendPage(uint16_t send_page_offset, uint16_t send_page_Length, byte can_id, byte cmd)
