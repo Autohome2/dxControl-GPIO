@@ -538,6 +538,94 @@ void setPinMapping(byte boardID)
       break;
       #endif 
 
+      #if defined(MEGA_AVR)
+      case 10: // turtana gpio extension
+      pinOut[1] = 32; //
+      pinOut[2] = 34; //
+      pinOut[3] = 36; //
+      pinOut[4] = 38; //
+      pinOut[5] = 24; //
+      pinOut[6] = 26; //
+      pinOut[7] = 28; //
+      pinOut[8] = 30; //
+      pinOut[9] = 40; //
+      pinOut[10] = 42; //
+      pinOut[11] = 44; //
+      pinOut[12] = 46; //
+      pinOut[13] = 48; //
+      pinOut[14] = 50; //
+      pinOut[15] = 52; //
+      pinOut[16] = 255; //
+      pinOut[17] = 255; //
+      pinOut[18] = 255; //
+      pinOut[19] = 255; //
+      pinOut[20] = 255; //
+      pinOut[21] = 255; //
+      pinOut[22] = 255; //
+      pinOut[23] = 255; //
+      pinOut[24] = 255; //
+      pinOut[25] = 255; //
+      pinOut[26] = 255; //
+      pinOut[27] = 255; //
+      pinOut[28] = 255; //
+      pinOut[29] = 255; //
+      pinOut[30] = 255; //
+      pinOut[31] = 255; //
+      pinOut[32] = 255; //
+      
+      pinIn[1] = 18;
+      pinIn[2] = 19;
+      pinIn[3] = 23;
+      pinIn[4] = 255;
+      pinIn[5] = 255;
+      pinIn[6] = 255;
+      pinIn[7] = 255;
+      pinIn[8] = 255;
+      pinIn[9] = 255;
+      pinIn[10] = 255;
+      pinIn[11] = 255;
+      pinIn[12] = 255;
+      pinIn[13] = 255;
+      pinIn[14] = 255;
+      pinIn[15] = 255;
+      pinIn[16] = 255;
+      pinIn[17] = 255;
+      pinIn[18] = 255;
+      pinIn[19] = 255;
+      pinIn[20] = 255;
+      pinIn[21] = 255;
+      pinIn[22] = 255;
+      pinIn[23] = 255;
+      pinIn[24] = 255;
+      pinIn[25] = 255;
+      pinIn[26] = 255;
+      pinIn[27] = 255;
+      pinIn[28] = 255;
+      pinIn[29] = 255;
+      pinIn[30] = 255;
+      pinIn[31] = 255;
+      pinIn[32] = 255;
+             
+      pinAin[1] = A7;
+      pinAin[2] = A8;
+      pinAin[3] = A9;
+      pinAin[4] = A10;
+      pinAin[5] = A11;
+      pinAin[6] = A12; // A5;
+      pinAin[7] = A13;
+      pinAin[8] = A14;
+      pinAin[9] = 255;
+      pinAin[10] = 255;
+      pinAin[11] = 255;
+      pinAin[12] = 255;
+      pinAin[13] = 255;
+      pinAin[14] = 255;
+      pinAin[15] = 255;
+      pinAin[16] = 255; 
+      
+      break;
+      #endif 
+
   }
 
   setpinmodes();  //now set pin modes eg input,output or analog

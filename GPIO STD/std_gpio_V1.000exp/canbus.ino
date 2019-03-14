@@ -15,10 +15,10 @@ void CAN1_INT_routine()
 {
    #if OBD_CANPORT == 1    //use can1 for obd data stream
         #if OBD_ACTIVE == 1
-           //if ((rxId == 0x7DF) || (rxId == (configPage3.gpio_obd_address+0x100)))
-           //   {
+           if ((rxId == 0x7DF) || (rxId == (configPage3.gpio_obd_address+0x100)))
+              {
                 obd_command(1);
-           //   }  
+              }  
         #endif
   #else
     receive_CAN1_message();      
@@ -466,7 +466,7 @@ uint16_t obd_response(byte therequestedPID, uint16_t therequestedCANID)
 
   case 10:      //fuel pressure(gauge pressure) 3A , range is 0 to 765 kPa
   uint16_t fuelpressure;
-  fuelpressure = 567;
+  fuelpressure = 567;                  // TEST VALUE !!!!
   obdcalcA = fuelpressure/3;
   obddata[0] =  0x03;    // sending 3 bytes
   obddata[1] =  0x41;    // Same as query, except that 40h is added to the mode value. So:41h = show current data ,42h = freeze frame ,etc.
@@ -573,7 +573,7 @@ uint16_t obd_response(byte therequestedPID, uint16_t therequestedCANID)
 
   case 19:      //oxygen sensors present, A0-A3 == bank1 , A4-A7 == bank2 , 
   uint16_t O2present;
-  O2present = B00000011 ;//realtimebufferA[24];
+  O2present = B00000011 ;//realtimebufferA[24];         TEST VALUE !!!!!
   obddata[0] =  0x03;    // sending 3 bytes
   obddata[1] =  0x41;    // Same as query, except that 40h is added to the mode value. So:41h = show current data ,42h = freeze frame ,etc.
   obddata[2] =  0x13;    // pid code
@@ -588,7 +588,7 @@ uint16_t obd_response(byte therequestedPID, uint16_t therequestedCANID)
   case 20:      //O2 sensor2, A voltage B short term fuel trim ,  A/200 ,((100/128) B) -100 , range is 0 to 1.275 and -100 to 99.2 percent
   uint16_t O2_1v;     // send data *10
   int16_t O2_1pc;     // data *10
-  O2_1v = 11;//(realtimebufferA[24]*10);
+  O2_1v = 11;//(realtimebufferA[24]*10);              TEST VALUE!!!!!
   O2_1pc = 27;//realtimebufferA[10]*10;
   obdcalcA = O2_1v *20;
   obdcalcB = (((O2_1pc +1000)*128)/1000);
@@ -604,9 +604,9 @@ uint16_t obd_response(byte therequestedPID, uint16_t therequestedCANID)
   break;
 
   case 21:      //O2 sensor2, A voltage B short term fuel trim ,  A/200 100/128 B -100 , range is 0 to 1.276 and -100 to 99.2 percent
-  uint16_t O2_2v;       //send data *10
+  uint16_t O2_2v;       //send data *10           
   int16_t O2_2pc;       //data *10
-  O2_2v = 12;   //realtimebufferA[24]*10;
+  O2_2v = 12;   //realtimebufferA[24]*10;           TEST VALUE!!!!
   O2_2pc = 26;  //realtimebufferA[39]*10;
   obdcalcA = O2_2v *20;
   obdcalcB = (((O2_2pc +1000)*128)/1000);
@@ -736,7 +736,7 @@ uint16_t obd_response(byte therequestedPID, uint16_t therequestedCANID)
 
   case 82:        //0B or MAP , A ,range is 0 to 255 kPa
   uint16_t ethanolpc;
-  ethanolpc = 42;//realtimebufferA[34];
+  ethanolpc = 42;//realtimebufferA[34];                        TEST VALUE !!!!!!!!!!
   obdcalcA = (ethanolpc *256) /100;
   obddata[0] =  0x03;    // sending 3 byte
   obddata[1] =  0x41;    // 

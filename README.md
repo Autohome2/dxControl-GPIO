@@ -7,6 +7,7 @@ The modules can use several different processor board types, including different
 
 Io operations are programmed with logic, < ,>,= and bitwise AND . some variants offer 2 or even 3 connecting logic conditions.
 
+
 Versions 
 GPIO MINI V0.001
 
@@ -18,6 +19,12 @@ Only onboard(local) io are supported in this version.
 GPIO MINI V0.002
 
 This firmware offers the same features as V0.001 but with the ability to also access the values from a Speeduino ECU connected directly using the Speeduino Serial3 support.
+
+GPIO MINI V3.005 !!!experimental at this time advanced users only!!
+This firmware supports up to 16 output channles , 16 analog input channels form local sources subject to MCU capability.
+The device can also aquire up to 16 channels of data from a speeduino ecu if connected to the gpio via serial3.
+MCU supported is only the mega2560 at this time.
+The Output channels can be activated via one condition with logical operations of < , > and =
 
 GPIO STD Version 1.00
 
