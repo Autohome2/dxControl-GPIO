@@ -228,7 +228,7 @@ void canbroadcastperfreq(byte freqcheck)
                   senddata[1] = 0;
                   byte tempD3 = configPage3.canbroadcast_chan_offset[(Bchan)];                  
                   //theaddress = (configPage3.canbroadcast_source_can_address[(bcChan-64)]+0x100);      
-                  if (tempD3 != 0 | tempD3 !=1 | tempD3!=2 | tempD3!= 13 | tempD3!=14 | tempD3!=15 |tempD3!=16 |tempD3!=17 )    //check if value is two bytes long
+                  if (tempD3 != 0 | tempD3 !=1 | tempD3!=2 | tempD3!= 13 | tempD3!=14 | tempD3!=15 |tempD3!=16 |tempD3!=17| tempD3!=18 | tempD3!=19 |tempD3!=20 |tempD3!=21 )    //check if value is two bytes long
                      {
                       senddata[1] = fullStatus[(configPage3.canbroadcast_chan_offset[(Bchan)]+1)];                                   //get the second byte
                      }

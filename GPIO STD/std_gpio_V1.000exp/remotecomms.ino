@@ -28,7 +28,8 @@ void remote_serial_command()
                   //if (SERIALLink.available() >= 74)
                   //  {
                       
-                      replylength = (SERIALLink.read());              //read in reply length
+         //             replylength = (SERIALLink.read());              //read in reply length
+                        replylength = 75;        // speedy is not sending the length value!!!! so needs to be fixed for now
                       //currentStatus.dev2 = replylength;
                       for (byte rdata = 0; rdata < replylength; rdata++) //read x bytes of data according to replylength
                         {
