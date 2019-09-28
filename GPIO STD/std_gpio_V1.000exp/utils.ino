@@ -35,15 +35,15 @@ uint16_t freeRam ()
 void setpinmodes()
 {
       //set can interrupt pins to input if active
-      if (BIT_sCHECK(configPage1.canModuleConfig, CAN0ENABLE) == 1)   //if can0 is enabled
+      if (CAN0_ACTIVE == 1)          //(BIT_sCHECK(configPage1.canModuleConfig, CAN0ENABLE) == 1)   //if can0 is enabled
          {
           pinMode(CAN0_INT, INPUT);                                  // set can0 int pin to input                    
-          pinMode(CAN0_INT, OUTPUT);
+          //pinMode(CAN0_INT, OUTPUT);
          }
-      if (BIT_sCHECK(configPage1.canModuleConfig, CAN1ENABLE) == 1)   //if can1 is enabled
+      if (CAN1_ACTIVE == 1)          //(BIT_sCHECK(configPage1.canModuleConfig, CAN1ENABLE) == 1)   //if can1 is enabled
          {
           pinMode(CAN1_INT, INPUT);                                  // set can1 int pin to input                    
-          pinMode(CAN1_INT, OUTPUT);
+          //pinMode(CAN1_INT, OUTPUT);
          }   
 
       //set the output pin modes 
